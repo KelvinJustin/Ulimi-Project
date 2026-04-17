@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment files
+credentials.txt
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# XAMPP/Apache
+query
+
+# Logs
+storage/debug.log
+*.log
+
+# Temporary files
+*.old
+*.tmp

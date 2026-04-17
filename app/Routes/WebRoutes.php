@@ -1,0 +1,112 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Routes;
+
+use App\Core\Router;
+use App\Core\Request;
+use App\Controllers\HomeController;
+use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
+use App\Controllers\BrowseController;
+use App\Controllers\PaymentController;
+use App\Controllers\AffiliateController;
+use App\Controllers\ProductController;
+use App\Controllers\ApiController;
+use App\Controllers\CartController;
+
+final class WebRoutes
+{
+    public function register(Router $router): void
+    {
+        $home = new HomeController();
+        $auth = new AuthController();
+        $dashboard = new DashboardController();
+        $browse = new BrowseController();
+                $payments = new PaymentController();
+        $affiliate = new AffiliateController();
+        $product = new ProductController();
+        $cart = new CartController();
+
+        $router->get('/', fn() => $home->index());
+        $router->get('/browse', fn() => $browse->index());
+        $router->get('/browse/{id}', fn(Request $req, array $params) => $browse->viewListing($req, $params));
+        $router->get('/favorites', fn() => $browse->favorites());
+
+        $router->get('/about', fn() => $affiliate->about());
+        $router->get('/marketplace-site', fn() => $affiliate->marketplaceSite());
+        $router->get('/services', fn() => $affiliate->services());
+        $router->get('/support', fn() => $affiliate->support());
+        $router->post('/support/submit', fn(Request $req) => $affiliate->supportSubmit());
+        $router->get('/auth', fn() => $affiliate->auth());
+
+        $router->get('/register', fn() => $auth->showRegister());
+        $router->post('/register', fn(Request $req) => $auth->register($req));
+
+        $router->get('/login', fn() => $auth->showLogin());
+        $router->post('/login', fn(Request $req) => $auth->login($req));
+
+        $router->post('/logout', fn(Request $req) => $auth->logout($req));
+        $router->post('/delete-account', fn(Request $req) => $auth->deleteAccount($req));
+        $router->get('/profile', fn() => $auth->profile());
+        
+        // Admin routes - Protected with admin-only access
+        $router->get('/admin', fn() => $auth->showAdmin());
+        $router->post('/admin/delete-all', fn(Request $req) => $auth->massDeleteUsers($req));
+
+        // Dashboard routes
+        $router->get('/dashboard', fn() => $dashboard->index());
+        $router->get('/admin/pending-listings', fn() => $product->getPendingListings());
+        $router->post('/admin/delete-user', fn(Request $req) => $dashboard->deleteUser($req));
+        $router->post('/admin/view-user', fn(Request $req) => $dashboard->viewUser($req));
+        $router->post('/admin/delete-user-no-auth', fn(Request $req) => $dashboard->deleteUserWithoutAuth($req));
+        $router->get('/admin/test', fn() => $dashboard->testEndpoint());
+        $router->get('/admin/dashboard', fn() => $dashboard->adminIndex());
+        $router->get('/admin/listings', fn() => $dashboard->adminListings());
+
+        // Product routes
+        $router->get('/create-listing', fn() => $product->showCreateListing());
+        $router->post('/create-listing', fn(Request $req) => $product->createListing($req));
+        $router->get('/listings', fn() => $product->showListings());
+        $router->get('/my-listings', fn() => $product->showSellerListings());
+        $router->get('/listings/edit/{id}', fn(Request $req, array $params) => $product->showEditListing($req, $params));
+        $router->post('/listings/edit/{id}', fn(Request $req, array $params) => $product->updateListing($req, $params));
+        $router->post('/listings/delete', fn(Request $req) => $product->deleteListing($req));
+        
+        // Listing lifecycle management
+        $router->post('/listings/approve', fn(Request $req) => $product->approveListing($req));
+        $router->post('/listings/reject', fn(Request $req) => $product->rejectListing($req));
+        $router->post('/listings/archive', fn(Request $req) => $product->archiveListing($req));
+        $router->get('/admin/pending-listings', fn() => $product->getPendingListings());
+        
+        // API routes
+        $api = new ApiController();
+        $router->get('/api/products', fn(Request $req) => $api->products($req));
+        $router->get('/api/seller-products', fn(Request $req) => $api->sellerProducts($req));
+        $router->post('/api/products', fn(Request $req) => $product->getProducts($req));
+
+        // Favorites API routes
+        $router->post('/api/favorites/add', fn(Request $req) => $api->addFavorite($req));
+        $router->post('/api/favorites/remove', fn(Request $req) => $api->removeFavorite($req));
+        $router->get('/api/favorites', fn(Request $req) => $api->getFavorites($req));
+
+        // Cart API routes
+        $router->post('/api/cart/add', fn(Request $req) => $cart->addItem($req));
+        $router->get('/api/cart', fn() => $cart->getCart());
+        $router->post('/api/cart/remove', fn(Request $req) => $cart->removeItem($req));
+        $router->post('/api/cart/update-quantity', fn(Request $req) => $cart->updateQuantity($req));
+
+        // Checkout route
+        $router->get('/checkout', fn() => $cart->checkout());
+
+        // PayChangu payment routes
+        $router->get('/payment/callback', fn(Request $req) => $payments->paymentCallback($req));
+        $router->get('/payment/return', fn(Request $req) => $payments->paymentReturn($req));
+
+        $router->get('/payments/stripe/{orderId}', fn(Request $req, array $params) => $payments->showStripeCheckout($req, $params));
+        $router->post('/payments/stripe/create', fn(Request $req) => $payments->createStripeCheckoutSession($req));
+        $router->get('/payments/stripe/success', fn(Request $req) => $payments->stripeSuccess($req));
+        $router->get('/payments/stripe/cancel', fn(Request $req) => $payments->stripeCancel($req));
+        $router->post('/webhooks/stripe', fn(Request $req) => $payments->stripeWebhook($req));
+    }
+}
