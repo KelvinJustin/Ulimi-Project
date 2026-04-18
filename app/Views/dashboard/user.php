@@ -755,6 +755,10 @@
             <i class="fa fa-search"></i>
             Browse Products
           </a>
+          <button onclick="openChatsModal()" class="secondary-action-btn">
+            <i class="fa fa-comments"></i>
+            Open Chats
+          </button>
         <?php endif; ?>
       </div>
     </section>
@@ -899,10 +903,87 @@
     </section>
   </div>
 
+  <!-- Chats Modal -->
+  <div id="chatsModal" class="fixed inset-0 bg-black/50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-sm w-full max-h-[80vh] overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">Your Chats</h2>
+          <button onclick="closeChatsModal()" class="text-gray-400 hover:text-gray-600">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+        <div id="chatsList" class="p-4 overflow-y-auto max-h-[60vh]">
+          <p class="text-gray-500 text-center py-8">Loading chats...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <?php require APP_PATH . '/Views/partials/footer-tailwind.php'; ?>
 
   <script>
     // Delete listing functionality
+
+    // Chats Modal
+    function openChatsModal() {
+      document.getElementById('chatsModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      loadChats();
+    }
+
+    function closeChatsModal() {
+      document.getElementById('chatsModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function loadChats() {
+      const chatsList = document.getElementById('chatsList');
+      
+      fetch('<?= $base ?>/api/messages/conversations')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.conversations.length > 0) {
+            chatsList.innerHTML = data.conversations.map(conv => `
+              <div class="flex items-start gap-3 p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  ${conv.other_name ? conv.other_name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between mb-1">
+                    <h3 class="font-semibold text-gray-900 truncate">${conv.other_name || 'Unknown'}</h3>
+                    <span class="text-xs text-gray-500">
+                      ${conv.last_message_time ? new Date(conv.last_message_time).toLocaleDateString() : ''}
+                    </span>
+                  </div>
+                  ${conv.listing_title ? `<p class="text-xs text-gray-500 mb-1"><i class="fa fa-tag mr-1"></i>${conv.listing_title}</p>` : ''}
+                  <p class="text-sm text-gray-600 truncate">${conv.last_message || 'No messages yet'}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  ${conv.seller_slug ? `
+                    <a href="<?= $base ?>/seller/${conv.seller_slug}" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm">
+                      <i class="fa fa-reply mr-1"></i>Reply
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('');
+          } else {
+            chatsList.innerHTML = '<p class="text-gray-500 text-center py-8">No chats yet. Start a conversation with a seller!</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading chats:', error);
+          chatsList.innerHTML = '<p class="text-red-500 text-center py-8">Failed to load chats</p>';
+        });
+    }
+
+    // Close modal on overlay click
+    document.getElementById('chatsModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeChatsModal();
+      }
+    });
   </script>
 </body>
 </html>

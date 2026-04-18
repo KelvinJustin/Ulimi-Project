@@ -52,8 +52,15 @@ function isNavLinkActive($href, $currentPath) {
     </div>
 
     <!-- Desktop auth buttons -->
-    <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center">
+    <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-4">
       <?php if ($isLoggedIn): ?>
+        <!-- Message notification -->
+        <div class="relative">
+          <a href="<?= $base ?>/dashboard" class="flex items-center justify-center w-10 h-10 rounded-full bg-soft-linen text-dark-fern hover:bg-olive hover:text-white transition-colors">
+            <i class="fa fa-envelope"></i>
+          </a>
+          <span id="messageBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">0</span>
+        </div>
         <!-- User dropdown -->
         <div class="relative" id="user-menu-container">
           <button type="button" id="user-menu-button" class="flex items-center gap-2 rounded-full bg-fern px-3 py-2 text-white hover:bg-olive transition-colors">
@@ -79,6 +86,9 @@ function isNavLinkActive($href, $currentPath) {
             </div>
             <div class="py-1">
               <a href="<?= $base ?>/dashboard" class="block px-4 py-2 text-sm text-dark-fern hover:bg-soft-linen">Dashboard</a>
+              <?php if ($user['role'] === 'seller'): ?>
+              <a href="<?= $base ?>/messages" class="block px-4 py-2 text-sm text-dark-fern hover:bg-soft-linen">Messages</a>
+              <?php endif; ?>
               <a href="<?= $base ?>/profile" class="block px-4 py-2 text-sm text-dark-fern hover:bg-soft-linen">Profile Settings</a>
               <?php if ($user['role'] === 'admin'): ?>
               <a href="<?= $base ?>/admin" class="block px-4 py-2 text-sm text-dark-fern hover:bg-soft-linen">Admin Terminal</a>
@@ -137,6 +147,9 @@ function isNavLinkActive($href, $currentPath) {
                   <p class="text-xs text-ash-grey"><?= htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <a href="<?= $base ?>/dashboard" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Dashboard</a>
+                <?php if ($user['role'] === 'seller'): ?>
+                <a href="<?= $base ?>/messages" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Messages</a>
+                <?php endif; ?>
                 <a href="<?= $base ?>/profile" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Profile Settings</a>
                 <?php if ($user['role'] === 'admin'): ?>
                 <a href="<?= $base ?>/admin" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Admin Terminal</a>
@@ -158,6 +171,8 @@ function isNavLinkActive($href, $currentPath) {
 </header>
 
 <script>
+window.currentUserId = <?= $isLoggedIn ? $user['id'] : 0 ?>;
+
 // Mobile menu toggle
 const mobileMenuButton = document.getElementById('mobile-menu-button');
 const mobileMenuClose = document.getElementById('mobile-menu-close');
@@ -205,4 +220,13 @@ if (userMenuButton && userDropdown) {
     }
   });
 }
+
+// Start notification polling if logged in
+<?php if ($isLoggedIn): ?>
+if (typeof startNotificationPolling === 'function') {
+  startNotificationPolling();
+}
+<?php endif; ?>
 </script>
+
+<script src="/assets/js/chat.js" defer></script>
