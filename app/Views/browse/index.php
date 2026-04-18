@@ -230,7 +230,7 @@
                     <img src="<?= $listing['image_path'] ? '/' . htmlspecialchars($listing['image_path']) : '/assets/images/placeholder-product.jpg' ?>"
                          alt="<?= htmlspecialchars($listing['title']) ?>"
                          class="product-image"
-                         onerror="this.src='/assets/images/placeholder-product.jpg'">
+                         onerror="this.style.display='none'; this.parentElement.style.backgroundColor='#f5f5f5'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'>No image</div>'">
                     <?= getProductBadge($listing) ?>
                   </div>
                 </a>
@@ -252,7 +252,7 @@
                   <div class="product-meta">
                     <div class="seller-info">
                       <i class="fas fa-user-circle"></i>
-                      <span class="seller-name"><?= htmlspecialchars(ucfirst($listing['display_name'] ?? 'Unknown Seller')) ?></span>
+                      <a href="<?= $base ?>/seller/<?= $listing['seller_slug'] ?? $listing['seller_id'] ?>" class="seller-name"><?= htmlspecialchars(ucfirst($listing['display_name'] ?? 'Unknown Seller')) ?></a>
                       <?php if ($listing['rating_avg'] > 0): ?>
                         <span class="verified-badge">Verified</span>
                       <?php endif; ?>

@@ -244,6 +244,40 @@ final class AuthController
         }
     }
 
+    private function generateUniqueSlug($pdo, $baseSlug): string
+    {
+        $slug = $this->slugify($baseSlug);
+        $counter = 1;
+        $originalSlug = $slug;
+
+        // Check if slug exists and generate unique one if needed
+        while (true) {
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE slug = ?");
+            $stmt->execute([$slug]);
+            $exists = $stmt->fetch();
+
+            if (!$exists) {
+                return $slug;
+            }
+
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+    }
+
+    private function slugify($text): string
+    {
+        // Convert to lowercase
+        $text = strtolower($text);
+        // Replace spaces with hyphens
+        $text = preg_replace('/[^a-z0-9]+/', '-', $text);
+        // Remove leading/trailing hyphens
+        $text = trim($text, '-');
+        // Limit length
+        $text = substr($text, 0, 100);
+        return $text ?: 'user';
+    }
+
     public function showAdmin(): void
     {
         // Require admin role
@@ -270,6 +304,115 @@ final class AuthController
             'user' => Auth::user(),
             'csrf' => Csrf::token()
         ]);
+    }
+
+    public function updateProfile(Request $request): void
+    {
+        // Validate CSRF token
+        if (!Csrf::verify($request->input('_csrf'))) {
+            http_response_code(419);
+            echo 'Invalid CSRF token';
+            return;
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            View::render('auth.profile', [
+                'title' => 'Error - Not Logged In',
+                'error' => 'You must be logged in to update your profile'
+            ]);
+            return;
+        }
+
+        $displayName = trim($request->input('display_name', ''));
+        $email = trim($request->input('email', ''));
+        $bio = trim($request->input('bio', ''));
+
+        $errors = [];
+
+        // Validate display name
+        if (!Validator::str($displayName, 3, 120)) {
+            $errors['display_name'] = 'Display name must be between 3 and 120 characters.';
+        }
+
+        // Validate email
+        if (!Validator::email($email)) {
+            $errors['email'] = 'Please enter a valid email address.';
+        }
+
+        // Check if email already exists (for different user)
+        if ($email !== $user['email']) {
+            $existingUser = FileUserStorage::findByEmail($email);
+            if ($existingUser && $existingUser['id'] !== $user['id']) {
+                $errors['email'] = 'Email already exists.';
+            }
+        }
+
+        if ($errors) {
+            View::render('auth.profile', [
+                'title' => 'Profile Settings - Ulimi',
+                'user' => $user,
+                'csrf' => Csrf::token(),
+                'errors' => $errors,
+                'old' => [
+                    'display_name' => $displayName,
+                    'email' => $email,
+                    'bio' => $bio
+                ]
+            ]);
+            return;
+        }
+
+        // Update file storage user
+        $success = FileUserStorage::updateUser($user['id'], [
+            'display_name' => $displayName,
+            'email' => $email
+        ]);
+
+        if ($success) {
+            // Update database user profile
+            $this->updateDatabaseProfile($user['id'], $displayName, $bio);
+
+            // Update session
+            $_SESSION['user']['display_name'] = $displayName;
+            $_SESSION['user']['email'] = $email;
+
+            $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
+            View::render('auth.profile-success', [
+                'title' => 'Profile Updated Successfully',
+                'user' => array_merge($user, ['display_name' => $displayName, 'email' => $email]),
+                'redirect_url' => $base . '/dashboard'
+            ]);
+        } else {
+            View::render('auth.profile', [
+                'title' => 'Profile Settings - Ulimi',
+                'user' => $user,
+                'csrf' => Csrf::token(),
+                'errors' => ['general' => 'Failed to update profile. Please try again.']
+            ]);
+        }
+    }
+
+    private function updateDatabaseProfile(int $userId, string $displayName, string $bio): void
+    {
+        try {
+            $pdo = \App\Core\Database::pdo();
+
+            // Update user email
+            $stmt = $pdo->prepare("UPDATE users SET email = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$displayName, $userId]);
+
+            // Update user profile
+            $stmt = $pdo->prepare("
+                UPDATE user_profiles
+                SET display_name = ?, bio = ?, updated_at = NOW()
+                WHERE user_id = ?
+            ");
+            $stmt->execute([$displayName, $bio, $userId]);
+
+        } catch (Exception $e) {
+            error_log('Failed to update database profile: ' . $e->getMessage());
+        }
     }
 
     public function massDeleteUsers(Request $request): void
@@ -345,15 +488,20 @@ final class AuthController
             $existing = $stmt->fetch();
             
             if (!$existing) {
+                // Generate slug from email username
+                $emailUsername = explode('@', $user['email'])[0];
+                $slug = $this->generateUniqueSlug($pdo, $emailUsername);
+
                 // Create user in database
                 $stmt = $pdo->prepare("
-                    INSERT INTO users (id, role_id, email, password_hash, status, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, 'active', NOW(), NOW())
+                    INSERT INTO users (id, role_id, email, slug, password_hash, status, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, 'active', NOW(), NOW())
                 ");
                 $stmt->execute([
                     $user['id'],
                     $roleId,
                     $user['email'],
+                    $slug,
                     $user['password_hash'] ?? password_hash('default', PASSWORD_DEFAULT)
                 ]);
             }

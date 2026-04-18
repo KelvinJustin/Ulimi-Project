@@ -127,19 +127,22 @@ final class BrowseController
             
             // Fetch user's favorite listing IDs with listing details
             $stmt = $pdo->prepare("
-                SELECT 
+                SELECT
                     cl.id,
                     cl.title,
                     cl.description,
                     cl.price_per_unit as price,
                     cl.quantity_available as quantity,
-                    cl.currency as unit,
+                    cl.currency,
                     cl.location_text as location,
                     cl.quality_grade,
+                    cl.status,
                     cl.created_at,
                     c.name as commodity_name,
                     c.category as commodity_category,
                     up.display_name as seller_name,
+                    u.id as seller_id,
+                    u.slug as seller_slug,
                     u.email as seller_email,
                     li.path as image_path
                 FROM favorites f
@@ -191,19 +194,22 @@ final class BrowseController
                     
                     // Retry fetching favorites after creating table
                     $stmt = $pdo->prepare("
-                        SELECT 
+                        SELECT
                             cl.id,
                             cl.title,
                             cl.description,
                             cl.price_per_unit as price,
                             cl.quantity_available as quantity,
-                            cl.currency as unit,
+                            cl.currency,
                             cl.location_text as location,
                             cl.quality_grade,
+                            cl.status,
                             cl.created_at,
                             c.name as commodity_name,
                             c.category as commodity_category,
                             up.display_name as seller_name,
+                            u.id as seller_id,
+                            u.slug as seller_slug,
                             u.email as seller_email,
                             li.path as image_path
                         FROM favorites f
@@ -281,6 +287,7 @@ final class BrowseController
                     c.category as commodity_category,
                     up.display_name as seller_name,
                     u.id as seller_id,
+                    u.slug as seller_slug,
                     u.email as seller_email,
                     li.path as gallery_image_path
                 FROM commodity_listings cl
@@ -336,6 +343,130 @@ final class BrowseController
             error_log('Error fetching listing: ' . $e->getMessage());
             http_response_code(500);
             echo 'Error loading listing';
+        }
+    }
+
+    public function viewSellerProfile(\App\Core\Request $request, array $params): void
+    {
+        $sellerSlug = $params['id'] ?? '';
+
+        if (empty($sellerSlug)) {
+            http_response_code(404);
+            echo 'Seller not found';
+            return;
+        }
+
+        try {
+            $pdo = \App\Core\Database::pdo();
+
+            // Fetch seller profile information by slug
+            $stmt = $pdo->prepare("
+                SELECT
+                    u.id as seller_id,
+                    u.slug as seller_slug,
+                    u.email as seller_email,
+                    u.created_at as user_created_at,
+                    up.display_name,
+                    up.business_name,
+                    up.bio,
+                    up.country,
+                    up.region,
+                    up.district,
+                    up.city,
+                    up.rating_avg,
+                    up.rating_count,
+                    up.avatar_path,
+                    up.created_at as profile_created_at
+                FROM users u
+                LEFT JOIN user_profiles up ON u.id = up.user_id
+                WHERE u.slug = ?
+                LIMIT 1
+            ");
+            $stmt->execute([$sellerSlug]);
+            $seller = $stmt->fetch();
+
+            if (!$seller) {
+                http_response_code(404);
+                echo 'Seller not found';
+                return;
+            }
+
+            $sellerId = $seller['seller_id'];
+
+            // Fetch seller's active listings
+            $stmt = $pdo->prepare("
+                SELECT
+                    cl.id,
+                    cl.title,
+                    cl.description,
+                    cl.price_per_unit as price,
+                    cl.quantity_available as quantity,
+                    cl.currency,
+                    cl.location_text as location,
+                    cl.quality_grade,
+                    cl.created_at,
+                    cl.image_path as listing_image_path,
+                    c.name as commodity_name,
+                    c.category as commodity_category,
+                    c.unit as commodity_unit,
+                    li.path as gallery_image_path
+                FROM commodity_listings cl
+                INNER JOIN commodities c ON cl.commodity_id = c.id
+                LEFT JOIN listing_images li ON cl.id = li.listing_id AND li.sort_order = 0
+                WHERE cl.seller_id = ? AND cl.status = 'active'
+                ORDER BY cl.created_at DESC
+                LIMIT 12
+            ");
+            $stmt->execute([$sellerId]);
+            $listings = $stmt->fetchAll();
+
+            // Use listing_image_path from commodity_listings as primary, fallback to gallery image
+            foreach ($listings as &$listing) {
+                $listing['image_path'] = $listing['listing_image_path'] ?? $listing['gallery_image_path'] ?? null;
+            }
+
+            // Calculate completed orders count (handle if orders table doesn't exist)
+            $completedOrders = 0;
+            $totalOrders = 0;
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) as completed_orders
+                    FROM orders
+                    WHERE seller_id = ? AND status = 'delivered'
+                ");
+                $stmt->execute([$sellerId]);
+                $completedOrders = $stmt->fetch()['completed_orders'] ?? 0;
+
+                // Calculate total orders count
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) as total_orders
+                    FROM orders
+                    WHERE seller_id = ?
+                ");
+                $stmt->execute([$sellerId]);
+                $totalOrders = $stmt->fetch()['total_orders'] ?? 0;
+            } catch (\PDOException $e) {
+                // Orders table doesn't exist yet, use defaults
+                error_log('Orders table not found: ' . $e->getMessage());
+            }
+
+            // Calculate cancellation rate
+            $cancellationRate = $totalOrders > 0 ? round(($totalOrders - $completedOrders) / $totalOrders * 100, 1) : 0;
+
+            View::render('browse.seller-profile', [
+                'title' => $seller['display_name'] . ' - Seller Profile - Ulimi Marketplace',
+                'seller' => $seller,
+                'listings' => $listings,
+                'completedOrders' => $completedOrders,
+                'totalOrders' => $totalOrders,
+                'cancellationRate' => $cancellationRate,
+                'isLoggedIn' => Auth::check()
+            ]);
+
+        } catch (\PDOException $e) {
+            error_log('Error fetching seller profile: ' . $e->getMessage());
+            http_response_code(500);
+            echo 'Error loading seller profile: ' . $e->getMessage();
         }
     }
 }

@@ -41,7 +41,7 @@ $userId = $isLoggedIn && $user ? $user['id'] : 'guest';
                    src="<?= htmlspecialchars($mainImage, ENT_QUOTES, 'UTF-8') ?>"
                    alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>"
                    class="w-full h-96 object-cover"
-                   onerror="this.src='/assets/images/placeholder-product.jpg'">
+                   onerror="this.style.display='none'; this.parentElement.style.backgroundColor='#f5f5f5'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'>No image</div>'">
             </div>
             <?php if (count($images) > 1): ?>
               <div class="grid grid-cols-4 gap-2">
@@ -57,7 +57,7 @@ $userId = $isLoggedIn && $user ? $user['id'] : 'guest';
                     <img src="<?= htmlspecialchars($thumbImage, ENT_QUOTES, 'UTF-8') ?>"
                          alt="Image <?= $index + 1 ?>"
                          class="w-full h-full object-cover"
-                         onerror="this.src='/assets/images/placeholder-product.jpg'">
+                         onerror="this.style.display='none'; this.parentElement.style.backgroundColor='#f5f5f5'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'>No image</div>'">
                   </button>
                 <?php endforeach; ?>
               </div>
@@ -172,7 +172,9 @@ $userId = $isLoggedIn && $user ? $user['id'] : 'guest';
           </div>
           <div>
             <h3 class="font-semibold text-gray-900">
-              <?= htmlspecialchars(ucfirst($listing['seller_name']), ENT_QUOTES, 'UTF-8') ?>
+              <a href="<?= $base ?>/seller/<?= $listing['seller_slug'] ?? $listing['seller_id'] ?>" class="hover:text-green-600 transition-colors">
+                <?= htmlspecialchars(ucfirst($listing['seller_name']), ENT_QUOTES, 'UTF-8') ?>
+              </a>
             </h3>
             <p class="text-sm text-gray-600">
               <?= htmlspecialchars($listing['location'], ENT_QUOTES, 'UTF-8') ?>

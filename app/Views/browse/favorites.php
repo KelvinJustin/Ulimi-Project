@@ -61,7 +61,9 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '');
               </div>
               <div class="flex items-center gap-2 text-gray-600 text-sm mb-4 pt-3 border-t border-gray-200">
                 <i class="fa fa-user"></i>
-                <?= htmlspecialchars(ucfirst($favorite['seller_name']), ENT_QUOTES, 'UTF-8') ?>
+                <a href="<?= $base ?>/seller/<?= $favorite['seller_slug'] ?? $favorite['seller_id'] ?>" class="hover:text-green-600 transition-colors">
+                  <?= htmlspecialchars(ucfirst($favorite['seller_name']), ENT_QUOTES, 'UTF-8') ?>
+                </a>
               </div>
               <div class="flex gap-2">
                 <a href="<?= $base ?>/browse" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-center hover:bg-green-700 transition-colors">

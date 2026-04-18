@@ -23,7 +23,9 @@ final class Listing
                     up.district,
                     up.region,
                     up.rating_avg,
-                    up.rating_count
+                    up.rating_count,
+                    u.id as seller_id,
+                    u.slug as seller_slug
                 FROM commodity_listings cl
                 LEFT JOIN commodities c ON cl.commodity_id = c.id
                 LEFT JOIN users u ON cl.seller_id = u.id
@@ -99,5 +101,125 @@ final class Listing
         $stmt = $this->db->prepare("SELECT * FROM listing_images WHERE listing_id = ?");
         $stmt->execute([$listingId]);
         return $stmt->fetchAll();
+    }
+
+    public function deleteBySellerId(int $sellerId): int
+    {
+        // Get all listings for this seller
+        $stmt = $this->db->prepare("SELECT id, image_path FROM commodity_listings WHERE seller_id = ?");
+        $stmt->execute([$sellerId]);
+        $listings = $stmt->fetchAll();
+
+        $deletedCount = 0;
+
+        foreach ($listings as $listing) {
+            // Delete images from filesystem
+            if (!empty($listing['image_path'])) {
+                $imagePath = __DIR__ . '/../../public/' . $listing['image_path'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+
+            // Fetch and delete images from listing_images table
+            $stmt = $this->db->prepare("SELECT path FROM listing_images WHERE listing_id = ?");
+            $stmt->execute([$listing['id']]);
+            $listingImages = $stmt->fetchAll();
+
+            foreach ($listingImages as $image) {
+                if (!empty($image['path'])) {
+                    $imagePath = __DIR__ . '/../../public/' . $image['path'];
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                }
+            }
+
+            // Delete from database in a transaction
+            $this->db->beginTransaction();
+            try {
+                // Delete from cart_items (foreign key constraint)
+                $this->db->prepare("DELETE FROM cart_items WHERE listing_id = ?")->execute([$listing['id']]);
+                // Delete from listing_images
+                $this->db->prepare("DELETE FROM listing_images WHERE listing_id = ?")->execute([$listing['id']]);
+                // Delete from commodity_listings
+                $this->db->prepare("DELETE FROM commodity_listings WHERE id = ?")->execute([$listing['id']]);
+                $this->db->commit();
+                $deletedCount++;
+            } catch (Exception $e) {
+                $this->db->rollBack();
+                error_log('Failed to delete listing ' . $listing['id'] . ': ' . $e->getMessage());
+            }
+        }
+
+        return $deletedCount;
+    }
+
+    public function cleanupOrphanedListings(): int
+    {
+        // Get all user IDs from file storage (the actual active users)
+        $fileUserIds = array_column(\App\Core\FileUserStorage::loadUsers(), 'id');
+
+        // Find listings where seller_id doesn't exist in file storage
+        if (empty($fileUserIds)) {
+            // If no users in file storage, delete all listings
+            $stmt = $this->db->prepare("SELECT id, seller_id, image_path FROM commodity_listings");
+            $stmt->execute();
+        } else {
+            // Get listings where seller_id is NOT in file storage users
+            $placeholders = implode(',', array_fill(0, count($fileUserIds), '?'));
+            $stmt = $this->db->prepare("
+                SELECT id, seller_id, image_path
+                FROM commodity_listings
+                WHERE seller_id NOT IN ($placeholders)
+            ");
+            $stmt->execute($fileUserIds);
+        }
+
+        $orphanedListings = $stmt->fetchAll();
+        $deletedCount = 0;
+
+        foreach ($orphanedListings as $listing) {
+            // Delete images from filesystem
+            if (!empty($listing['image_path'])) {
+                $imagePath = __DIR__ . '/../../public/' . $listing['image_path'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+
+            // Fetch and delete images from listing_images table
+            $stmt = $this->db->prepare("SELECT path FROM listing_images WHERE listing_id = ?");
+            $stmt->execute([$listing['id']]);
+            $listingImages = $stmt->fetchAll();
+
+            foreach ($listingImages as $image) {
+                if (!empty($image['path'])) {
+                    $imagePath = __DIR__ . '/../../public/' . $image['path'];
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                }
+            }
+
+            // Delete from database in a transaction
+            $this->db->beginTransaction();
+            try {
+                // Delete from cart_items (foreign key constraint)
+                $this->db->prepare("DELETE FROM cart_items WHERE listing_id = ?")->execute([$listing['id']]);
+                // Delete from listing_images
+                $this->db->prepare("DELETE FROM listing_images WHERE listing_id = ?")->execute([$listing['id']]);
+                // Delete from commodity_listings
+                $this->db->prepare("DELETE FROM commodity_listings WHERE id = ?")->execute([$listing['id']]);
+                $this->db->commit();
+                $deletedCount++;
+                error_log('Deleted orphaned listing ID: ' . $listing['id'] . ' for seller_id: ' . $listing['seller_id']);
+            } catch (Exception $e) {
+                $this->db->rollBack();
+                error_log('Failed to delete orphaned listing ' . $listing['id'] . ': ' . $e->getMessage());
+            }
+        }
+
+        return $deletedCount;
     }
 }
