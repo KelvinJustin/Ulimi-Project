@@ -5,446 +5,256 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($title ?? 'Services', ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/app.css">
   <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/output.css">
   <link rel="icon" type="image/png" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/logo.png">
   <style>
-    /* Services page scoped styles */
+    body { font-family: 'Manrope', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .primary-gradient {
+      background: linear-gradient(135deg, #16642e 0%, #347e44 100%);
+    }
     .services-page {
-      --services-bg: #f2ede4;
-      --services-card-bg: rgba(255,255,255,0.92);
-      --services-border: rgba(171,175,159,0.2);
-      --services-text: #1a3d22;
-      --services-accent: #347e44;
-      --services-subtle: #abaf9f;
-      background: var(--services-bg);
-      color: var(--services-text);
-      font-family: 'DM Sans', sans-serif;
+      background: #fef9f0;
+      color: #1d1c16;
       line-height: 1.6;
     }
 
-    /* Fresh logo styles for services site */
-    .services-page header .logo {
-      display: flex !important;
-      align-items: center !important;
-      text-decoration: none !important;
-      color: #1a3d22 !important;
-      font-weight: 600 !important;
-      font-size: 1.5rem !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+    /* Hero section responsive fixes */
+    @media (max-width: 1024px) {
+      .hero-image-container {
+        aspect-ratio: 3/4 !important;
+        max-height: 400px;
+      }
     }
 
-    .services-page header .logo-mark {
-      width: 32px !important;
-      height: 32px !important;
-      margin-right: 12px !important;
-      background: #347e44 !important;
-      border-radius: 50% !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-
-    .services-page header .logo-mark svg {
-      width: 20px !important;
-      height: 20px !important;
-      fill: white !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      display: block !important;
-    }
-
-    .services-section {
-      padding: 80px 0;
-    }
-
-    .services-container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .services-hero {
-      text-align: center;
-      padding: 120px 0 80px;
-      background: linear-gradient(135deg, rgba(61,107,63,0.08) 0%, rgba(200,168,75,0.07) 100%);
-    }
-
-    .services-hero h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 3.5rem;
-      font-weight: 400;
-      margin-bottom: 1.5rem;
-      color: var(--services-text);
-    }
-
-    .services-hero p {
-      font-size: 1.25rem;
-      margin-bottom: 2.5rem;
-      color: var(--services-subtle);
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-btn {
-      display: inline-block;
-      padding: 14px 32px;
-      background: var(--services-accent);
-      color: white;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 500;
-      transition: all 0.3s;
-      border: 2px solid var(--services-accent);
-    }
-
-    .cta-btn:hover {
-      background: transparent;
-      color: var(--services-accent);
-    }
-
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 2rem;
-      margin-bottom: 4rem;
-    }
-
-    .service-card {
-      background: var(--services-card-bg);
-      border-radius: 16px;
-      padding: 2.5rem;
-      box-shadow: 0 8px 32px rgba(43,42,37,0.06);
-      border: 1px solid var(--services-border);
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .service-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(43,42,37,0.12);
-    }
-
-    .service-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 2rem;
-      background: var(--services-accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: white;
-    }
-
-    .service-card h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: var(--services-text);
-    }
-
-    .service-card p {
-      color: var(--services-subtle);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-
-    .service-features {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      text-align: left;
-    }
-
-    .service-features li {
-      padding: 0.5rem 0;
-      padding-left: 1.5rem;
-      position: relative;
-      color: var(--services-subtle);
-    }
-
-    .service-features li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--services-accent);
-      font-weight: bold;
-    }
-
-    .process-section {
-      background: linear-gradient(135deg, rgba(61,107,63,0.05) 0%, rgba(200,168,75,0.04) 100%);
-      padding: 80px 0;
-    }
-
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .process-step {
-      text-align: center;
-    }
-
-    .step-number {
-      width: 60px;
-      height: 60px;
-      margin: 0 auto 1.5rem;
-      background: var(--services-accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem;
-      color: white;
-    }
-
-    .process-step h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.25rem;
-      margin-bottom: 1rem;
-      color: var(--services-text);
-    }
-
-    .process-step p {
-      color: var(--services-subtle);
-    }
-
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2.5rem;
-      text-align: center;
-      margin-bottom: 3rem;
-      color: var(--services-text);
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-      .services-hero h1 {
-        font-size: 2.5rem;
+      .hero-image-container {
+        aspect-ratio: 4/5 !important;
+        max-height: 350px;
       }
-
-      .services-hero p {
-        font-size: 1.1rem;
-      }
-
-      .services-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .process-steps {
-        grid-template-columns: 1fr;
+      .hero-accent-blob {
+        display: none;
       }
     }
 
-    /* Critical Breakpoint - Fix 531px/607px width issue */
-    @media (max-width: 540px) {
-      .services-hero {
-        padding: 2.75rem 0.875rem;
-      }
-      
-      .services-hero h1 {
-        font-size: 1.875rem;
-      }
-      
-      .services-hero p {
-        font-size: 0.95rem;
-      }
-      
-      .section-title {
-        font-size: 1.875rem;
-      }
-      
-      .service-card {
-        padding: 1.25rem;
-      }
-      
-      .process-step {
-        padding: 1.25rem;
-      }
-    }
-
-    /* Mobile phones - Small (Fixes 640px/607px issues) */
-    @media (max-width: 640px) {
-      .services-hero {
-        padding: 3rem 1rem;
-      }
-      
-      .services-hero h1 {
-        font-size: 2rem;
-      }
-      
-      .services-hero p {
-        font-size: 1rem;
-      }
-      
-      .section-title {
-        font-size: 2rem;
-      }
-    }
-
-    /* Mobile phones - Extra small */
     @media (max-width: 480px) {
-      .services-hero {
-        padding: 2rem 0.75rem;
-      }
-      
-      .services-hero h1 {
-        font-size: 1.75rem;
-      }
-      
-      .services-hero p {
-        font-size: 0.95rem;
-      }
-      
-      .section-title {
-        font-size: 1.75rem;
+      .hero-image-container {
+        aspect-ratio: 4/5 !important;
+        max-height: 280px;
       }
     }
 
-    /* Ultra small screens */
     @media (max-width: 360px) {
-      .services-hero h1 {
-        font-size: 1.5rem;
+      .hero-image-container {
+        aspect-ratio: 4/5 !important;
+        max-height: 240px;
       }
-      
-      .section-title {
-        font-size: 1.5rem;
-      }
+    }
+
+    /* Prevent horizontal overflow */
+    .hero-section {
+      overflow-x: hidden;
     }
   </style>
 </head>
-<body>
+<body class="bg-[#fef9f0] text-[#1d1c16]">
 
 <?php require APP_PATH . '/Views/partials/header-tailwind.php'; ?>
-  <div class="services-page">
   <?php $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/'); ?>
 
   <!-- Hero Section -->
-  <section class="services-hero">
-    <div class="services-container">
-      <h1>Our Services</h1>
-      <p>Ulimi offers a comprehensive suite of services designed to empower farmers, buyers, and suppliers in the agricultural marketplace. From secure transactions to AI-powered insights, we provide everything you need to succeed.</p>
-      <a href="<?= $base ?>/register" class="cta-btn">Get Started</a>
+  <section class="max-w-7xl mx-auto px-6 py-20 hero-section">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div class="space-y-8">
+        <div class="space-y-4">
+          <span class="inline-block px-4 py-1.5 rounded-full bg-[#fdd97b] text-[#785d06] text-xs font-bold uppercase tracking-widest">Our Services</span>
+          <h1 class="text-6xl font-bold text-[#1d1c16] tracking-tighter leading-tight">
+            Cultivating <span class="text-[#16642e] italic">Growth</span> for the Global South.
+          </h1>
+          <p class="text-lg text-[#40493f] leading-relaxed max-w-xl">
+            Ulimi provides a comprehensive ecosystem for farmers, buyers, and suppliers. From transparent marketplace trading to AI-driven demand forecasting, we bridge the gap between traditional harvest and modern commerce.
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="<?= $base ?>/register" class="primary-gradient text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-lg active:scale-95 transition-all">Get Started</a>
+          <button class="bg-[#ece8df] text-[#1d1c16] px-8 py-4 rounded-full font-bold text-lg hover:bg-[#e7e2d9] transition-all">Watch Demo</button>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="hero-image-container aspect-[1/5] rounded-[2rem] overflow-hidden shadow-2xl relative z-10">
+          <img src="https://images.pexels.com/photos/30750514/pexels-photo-30750514/free-photo-of-vibrant-market-scene-with-banana-vendors.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1" alt="Vibrant market scene with banana vendors" class="w-full h-full object-cover">
+        </div>
+        <!-- Asymmetric accent -->
+        <div class="hero-accent-blob absolute -bottom-6 -left-6 w-48 h-48 bg-[#fdd97b] rounded-3xl -z-10 opacity-50 blur-2xl"></div>
+      </div>
     </div>
   </section>
 
-  <!-- Services Grid -->
-  <section class="services-section">
-    <div class="services-container">
-      <h2 class="section-title">What We Offer</h2>
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon"><i class="fa fa-exchange"></i></div>
-          <h3>Marketplace Trading</h3>
-          <p>Connect directly with buyers and sellers in our Malawi agricultural marketplace with secure, transparent transactions.</p>
-          <ul class="service-features">
-            <li>Real-time price tracking</li>
-            <li>Secure payment processing</li>
-            <li>100% deal protection</li>
-            <li>Malawi buyer network</li>
-          </ul>
+  <!-- Services Grid Section -->
+  <section class="bg-[#f8f3ea] py-24">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-between items-end mb-16">
+        <div class="max-w-2xl">
+          <h2 class="text-4xl font-bold text-[#1d1c16] mb-4">What We Offer</h2>
+          <p class="text-[#40493f]">Tailored tools designed to empower every link in the agricultural value chain.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Card 1: Marketplace -->
+        <div class="bg-white p-8 rounded-[1.5rem] shadow-[0px_12px_32px_rgba(26,61,34,0.06)] hover:-translate-y-2 transition-transform duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-[#16642e]/10 flex items-center justify-center text-[#16642e] mb-6">
+            <span class="material-symbols-outlined text-3xl">storefront</span>
+          </div>
+          <h3 class="text-xl font-bold text-[#1d1c16] mb-3">Marketplace Trading</h3>
+          <p class="text-[#40493f] mb-6 text-sm leading-relaxed">
+            Secure, transparent transactions with real-time price tracking and integrated secure payments.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Secure Escrow</span>
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Price Index</span>
+          </div>
         </div>
 
-        <div class="service-card">
-          <div class="service-icon"><i class="fa fa-brain"></i></div>
-          <h3>AI-Powered Insights</h3>
-          <p>Leverage artificial intelligence to make smarter trading decisions with predictive analytics and market intelligence.</p>
-          <ul class="service-features">
-            <li>Price predictions</li>
-            <li>Market trend analysis</li>
-            <li>Demand forecasting</li>
-            <li>Risk assessment</li>
-          </ul>
+        <!-- Card 2: AI Insights -->
+        <div class="bg-white p-8 rounded-[1.5rem] shadow-[0px_12px_32px_rgba(26,61,34,0.06)] hover:-translate-y-2 transition-transform duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-[#6d5e18]/10 flex items-center justify-center text-[#6d5e18] mb-6">
+            <span class="material-symbols-outlined text-3xl">psychology</span>
+          </div>
+          <h3 class="text-xl font-bold text-[#1d1c16] mb-3">AI-Powered Insights</h3>
+          <p class="text-[#40493f] mb-6 text-sm leading-relaxed">
+            Leverage predictive analytics and deep market trends to forecast demand and optimize planting seasons.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Forecasting</span>
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Yield Predictor</span>
+          </div>
         </div>
 
-        <div class="service-card">
-          <div class="service-icon"><i class="fa fa-money"></i></div>
-          <h3>Financing Solutions</h3>
-          <p>Access tailored financing options to grow your agricultural business with flexible payment terms and competitive rates.</p>
-          <ul class="service-features">
-            <li>Trade financing</li>
-            <li>Inventory funding</li>
-            <li>Crop insurance</li>
-            <li>Flexible repayment</li>
-          </ul>
+        <!-- Card 3: Financing -->
+        <div class="bg-white p-8 rounded-[1.5rem] shadow-[0px_12px_32px_rgba(26,61,34,0.06)] hover:-translate-y-2 transition-transform duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-[#755b03]/10 flex items-center justify-center text-[#755b03] mb-6">
+            <span class="material-symbols-outlined text-3xl">account_balance_wallet</span>
+          </div>
+          <h3 class="text-xl font-bold text-[#1d1c16] mb-3">Financing Solutions</h3>
+          <p class="text-[#40493f] mb-6 text-sm leading-relaxed">
+            Access trade financing, crop insurance, and flexible repayment terms tailored to agricultural cycles.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Insurance</span>
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Credit Score</span>
+          </div>
         </div>
 
-        <div class="service-card">
-          <div class="service-icon"><i class="fa fa-globe"></i></div>
-          <h3>Malawi Logistics</h3>
-          <p>Streamline your supply chain with our integrated logistics network connecting producers to markets across Malawi.</p>
-          <ul class="service-features">
-            <li>Shipping coordination</li>
-            <li>Customs clearance</li>
-            <li>Quality inspection</li>
-            <li>Real-time tracking</li>
-          </ul>
+        <!-- Card 4: Logistics -->
+        <div class="bg-white p-8 rounded-[1.5rem] shadow-[0px_12px_32px_rgba(26,61,34,0.06)] hover:-translate-y-2 transition-transform duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-[#16642e]/10 flex items-center justify-center text-[#16642e] mb-6">
+            <span class="material-symbols-outlined text-3xl">local_shipping</span>
+          </div>
+          <h3 class="text-xl font-bold text-[#1d1c16] mb-3">Malawi Logistics</h3>
+          <p class="text-[#40493f] mb-6 text-sm leading-relaxed">
+            Integrated logistics network with automated shipping coordination and quality inspections at every hub.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Tracking</span>
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">QC Nodes</span>
+          </div>
         </div>
 
-        <div class="service-card">
-          <div class="service-icon"><i class="fa fa-mobile"></i></div>
-          <h3>Mobile Trading</h3>
-          <p>Trade on the go with our mobile-optimized platform, enabling negotiations and transactions from anywhere.</p>
-          <ul class="service-features">
-            <li>Mobile negotiations</li>
-            <li>Push notifications</li>
-            <li>Offline mode</li>
-            <li>Voice transactions</li>
-          </ul>
+        <!-- Card 5: Mobile Trading -->
+        <div class="bg-white p-8 rounded-[1.5rem] shadow-[0px_12px_32px_rgba(26,61,34,0.06)] hover:-translate-y-2 transition-transform duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-[#6d5e18]/10 flex items-center justify-center text-[#6d5e18] mb-6">
+            <span class="material-symbols-outlined text-3xl">phone_iphone</span>
+          </div>
+          <h3 class="text-xl font-bold text-[#1d1c16] mb-3">Mobile Trading</h3>
+          <p class="text-[#40493f] mb-6 text-sm leading-relaxed">
+            Negotiate and trade on the go with full offline mode and innovative voice-to-trade transactions.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Offline Mode</span>
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Voice Cmds</span>
+          </div>
         </div>
 
-        <div class="service-card">
-          <div class="service-icon"><i class="fa fa-shield"></i></div>
-          <h3>Trust & Safety</h3>
-          <p>Trade with confidence knowing every transaction is protected by our comprehensive security and verification system.</p>
-          <ul class="service-features">
-            <li>Identity verification</li>
-            <li>Escrow protection</li>
-            <li>Dispute resolution</li>
-            <li>Fraud prevention</li>
-          </ul>
+        <!-- Card 6: Trust & Safety -->
+        <div class="bg-white p-8 rounded-[1.5rem] shadow-[0px_12px_32px_rgba(26,61,34,0.06)] hover:-translate-y-2 transition-transform duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-[#755b03]/10 flex items-center justify-center text-[#755b03] mb-6">
+            <span class="material-symbols-outlined text-3xl">verified_user</span>
+          </div>
+          <h3 class="text-xl font-bold text-[#1d1c16] mb-3">Trust & Safety</h3>
+          <p class="text-[#40493f] mb-6 text-sm leading-relaxed">
+            Advanced identity verification, escrow protection, and rapid dispute resolution for total peace of mind.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">KYC Verified</span>
+            <span class="px-3 py-1 bg-[#f8f3ea] rounded-full text-xs font-medium text-[#40493f]">Escrow</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Process Section -->
-  <section class="process-section">
-    <div class="services-container">
-      <h2 class="section-title">How It Works</h2>
-      <div class="process-steps">
-        <div class="process-step">
-          <div class="step-number">1</div>
-          <h3>Sign Up</h3>
-          <p>Create your free account and complete your profile to access our marketplace.</p>
+  <!-- How It Works Section -->
+  <section class="py-24 bg-[#fef9f0]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-20">
+        <h2 class="text-4xl font-bold text-[#1d1c16] mb-4">How It Works</h2>
+        <p class="text-[#40493f]">Empowering your agricultural journey in four simple steps.</p>
+      </div>
+      <div class="relative grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Connection Line (Desktop only) -->
+        <div class="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-[#bfc9bc]/30 -z-10"></div>
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg border-4 border-[#fef9f0] mb-6 group-hover:border-[#a7f5ae] transition-all">
+            <span class="text-3xl font-extrabold text-[#16642e]">1</span>
+          </div>
+          <h4 class="text-lg font-bold text-[#1d1c16] mb-2">Sign Up</h4>
+          <p class="text-sm text-[#40493f] leading-relaxed">Create your profile as a farmer, buyer, or supplier in minutes.</p>
         </div>
-        <div class="process-step">
-          <div class="step-number">2</div>
-          <h3>Browse & Connect</h3>
-          <p>Explore listings or post your products. Connect with buyers or suppliers directly.</p>
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg border-4 border-[#fef9f0] mb-6 group-hover:border-[#a7f5ae] transition-all">
+            <span class="text-3xl font-extrabold text-[#16642e]">2</span>
+          </div>
+          <h4 class="text-lg font-bold text-[#1d1c16] mb-2">Browse & Connect</h4>
+          <p class="text-sm text-[#40493f] leading-relaxed">Discover trusted partners and live marketplace listings near you.</p>
         </div>
-        <div class="process-step">
-          <div class="step-number">3</div>
-          <h3>Negotiate & Trade</h3>
-          <p>Use our platform to negotiate terms and complete secure transactions with full protection.</p>
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg border-4 border-[#fef9f0] mb-6 group-hover:border-[#a7f5ae] transition-all">
+            <span class="text-3xl font-extrabold text-[#16642e]">3</span>
+          </div>
+          <h4 class="text-lg font-bold text-[#1d1c16] mb-2">Negotiate & Trade</h4>
+          <p class="text-sm text-[#40493f] leading-relaxed">Directly negotiate prices and secure deals via protected escrow.</p>
         </div>
-        <div class="process-step">
-          <div class="step-number">4</div>
-          <h3>Grow Your Business</h3>
-          <p>Access insights, financing, and logistics support to scale your agricultural operations.</p>
+        <!-- Step 4 -->
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg border-4 border-[#fef9f0] mb-6 group-hover:border-[#a7f5ae] transition-all">
+            <span class="text-3xl font-extrabold text-[#16642e]">4</span>
+          </div>
+          <h4 class="text-lg font-bold text-[#1d1c16] mb-2">Grow Your Business</h4>
+          <p class="text-sm text-[#40493f] leading-relaxed">Expand your reach and maximize your harvest value consistently.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="max-w-7xl mx-auto px-6 mb-24">
+    <div class="primary-gradient rounded-[2.5rem] p-12 md:p-20 text-center text-white overflow-hidden relative">
+      <div class="relative z-10">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to transform your harvest?</h2>
+        <p class="text-lg mb-10 max-w-2xl mx-auto opacity-90">Join thousands of farmers and traders already leveraging the Ulimi ecosystem for better growth and secure commerce.</p>
+        <a href="<?= $base ?>/register" class="bg-white text-[#16642e] px-10 py-4 rounded-full font-bold text-lg shadow-xl hover:scale-105 active:scale-95 transition-all inline-block">Start Your Journey Now</a>
+      </div>
+      <!-- Background decorative elements -->
+      <div class="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-[#fdd97b]/20 rounded-full blur-3xl"></div>
     </div>
   </section>
 

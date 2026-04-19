@@ -56,9 +56,15 @@ function isNavLinkActive($href, $currentPath) {
       <?php if ($isLoggedIn): ?>
         <!-- Message notification -->
         <div class="relative">
-          <a href="<?= $base ?>/dashboard" class="flex items-center justify-center w-10 h-10 rounded-full bg-soft-linen text-dark-fern hover:bg-olive hover:text-white transition-colors">
-            <i class="fa fa-envelope"></i>
-          </a>
+          <?php if ($user['role'] === 'seller'): ?>
+            <a href="<?= $base ?>/messages" class="flex items-center justify-center w-10 h-10 rounded-full bg-soft-linen text-dark-fern hover:bg-olive hover:text-white transition-colors">
+              <i class="fa fa-envelope"></i>
+            </a>
+          <?php else: ?>
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-400 cursor-not-allowed" title="Messages available for sellers only">
+              <i class="fa fa-envelope"></i>
+            </div>
+          <?php endif; ?>
           <span id="messageBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">0</span>
         </div>
         <!-- User dropdown -->
@@ -148,7 +154,10 @@ function isNavLinkActive($href, $currentPath) {
                 </div>
                 <a href="<?= $base ?>/dashboard" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Dashboard</a>
                 <?php if ($user['role'] === 'seller'): ?>
-                <a href="<?= $base ?>/messages" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Messages</a>
+                <div class="relative">
+                  <a href="<?= $base ?>/messages" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Messages</a>
+                  <span id="mobileMessageBadge" class="hidden absolute -top-1 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">0</span>
+                </div>
                 <?php endif; ?>
                 <a href="<?= $base ?>/profile" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Profile Settings</a>
                 <?php if ($user['role'] === 'admin'): ?>

@@ -296,4 +296,36 @@ final class DashboardController
             echo json_encode(['success' => false, 'message' => 'Failed to delete user']);
         }
     }
+
+    public function cleanupOrphanedListings(Request $request): void
+    {
+        header('Content-Type: application/json');
+
+        // Check admin role
+        if (!Auth::check() || !Auth::isAdmin()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Admin access required']);
+            return;
+        }
+
+        // Verify CSRF token
+        if (!Csrf::verify($request->input('_csrf'))) {
+            http_response_code(419);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
+        try {
+            $deletedCount = \App\Core\FileUserStorage::cleanupOrphanedListings();
+            echo json_encode([
+                'success' => true,
+                'message' => "Cleaned up {$deletedCount} orphaned listings",
+                'deleted_count' => $deletedCount
+            ]);
+        } catch (Exception $e) {
+            error_log('Failed to cleanup orphaned listings: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to cleanup orphaned listings']);
+        }
+    }
 }

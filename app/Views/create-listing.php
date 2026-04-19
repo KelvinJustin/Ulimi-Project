@@ -208,66 +208,94 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
     .progress-indicator {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 2rem;
+      align-items: center;
+      margin-bottom: 2.5rem;
       position: relative;
     }
+
+    .progress-indicator::before {
+      content: '';
+      position: absolute;
+      top: calc(48px / 2 - 3px / 2);
+      left: 24px;
+      right: 24px;
+      height: 3px;
+      background: #e5e7eb;
+      z-index: 1;
+    }
+
+    .progress-indicator::after {
+      content: '';
+      position: absolute;
+      top: calc(48px / 2 - 3px / 2);
+      left: 24px;
+      height: 3px;
+      background: var(--listing-accent);
+      z-index: 1;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .progress-indicator.progress-0::after { width: 0%; }
+    .progress-indicator.progress-1::after { width: 0%; }
+    .progress-indicator.progress-2::after { width: 33.33%; }
+    .progress-indicator.progress-3::after { width: 66.66%; }
+    .progress-indicator.progress-4::after { width: 100%; }
 
     .progress-step {
       flex: 1;
       text-align: center;
       position: relative;
-    }
-
-    .progress-step::before {
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      width: 100%;
-      height: 2px;
-      background: var(--listing-border);
-      z-index: 1;
-    }
-
-    .progress-step:last-child::before {
-      display: none;
-    }
-
-    .progress-step.active::before {
-      background: var(--listing-accent);
+      z-index: 2;
     }
 
     .progress-number {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: var(--listing-border);
-      color: white;
+      background: white;
+      border: 3px solid #e5e7eb;
+      color: #9ca3af;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 0.5rem;
-      position: relative;
-      z-index: 2;
-      font-weight: 600;
+      margin: 0 auto 0.75rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .progress-step.active .progress-number {
       background: var(--listing-accent);
+      border-color: var(--listing-accent);
+      color: white;
+      box-shadow: 0 4px 12px rgba(61, 107, 63, 0.3);
+      transform: scale(1.05);
     }
 
     .progress-step.completed .progress-number {
       background: var(--listing-success);
+      border-color: var(--listing-success);
+      color: white;
     }
 
     .progress-label {
-      font-size: 0.9rem;
-      color: var(--listing-subtle);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
     }
 
     .progress-step.active .progress-label {
-      color: var(--listing-text);
-      font-weight: 500;
+      color: var(--listing-accent);
+      font-weight: 600;
+    }
+
+    .progress-step.completed .progress-label {
+      color: var(--listing-success);
     }
 
     /* Responsive */
@@ -727,16 +755,30 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
       // Progress indicator
       function updateProgress() {
         const sections = document.querySelectorAll('.form-section');
-        const currentSection = Math.ceil(Array.from(sections).findIndex(section => {
-          const inputs = section.querySelectorAll('input, select, textarea');
-          return Array.from(inputs).some(input => input.value === '');
-        }) / 2) + 1;
+        const progressIndicator = document.querySelector('.progress-indicator');
         
+        // Calculate completed sections
+        let completedSections = 0;
+        for (let i = 0; i < sections.length; i++) {
+          const inputs = sections[i].querySelectorAll('input, select, textarea');
+          const isEmpty = Array.from(inputs).some(input => input.value === '');
+          if (!isEmpty) {
+            completedSections = i + 1;
+          } else {
+            break; // Stop at first incomplete section
+          }
+        }
+        
+        // Update progress line fill
+        progressIndicator.classList.remove('progress-0', 'progress-1', 'progress-2', 'progress-3', 'progress-4');
+        progressIndicator.classList.add('progress-' + completedSections);
+        
+        // Update step states
         progressSteps.forEach((step, index) => {
           step.classList.remove('active', 'completed');
-          if (index < currentSection - 1) {
+          if (index < completedSections) {
             step.classList.add('completed');
-          } else if (index === currentSection - 1) {
+          } else if (index === completedSections) {
             step.classList.add('active');
           }
         });

@@ -84,10 +84,43 @@ class FileUserStorage
         return self::saveUsers($users);
     }
 
-    public static function deleteUser(int $userId): bool
+    public static function updateUser(int $userId, array $userData): bool
     {
         $users = self::loadUsers();
         
+        // Find the user to update
+        $userIndex = -1;
+        foreach ($users as $index => $user) {
+            if ($user['id'] === $userId) {
+                $userIndex = $index;
+                break;
+            }
+        }
+        
+        if ($userIndex === -1) {
+            return false; // User not found
+        }
+        
+        // Update user data
+        if (isset($userData['display_name'])) {
+            $users[$userIndex]['display_name'] = $userData['display_name'];
+        }
+        
+        if (isset($userData['email'])) {
+            $users[$userIndex]['email'] = $userData['email'];
+        }
+        
+        if (isset($userData['password'])) {
+            $users[$userIndex]['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
+        }
+        
+        return self::saveUsers($users);
+    }
+
+    public static function deleteUser(int $userId): bool
+    {
+        $users = self::loadUsers();
+
         // Find the user to delete
         $userToDelete = null;
         foreach ($users as $user) {
@@ -96,23 +129,70 @@ class FileUserStorage
                 break;
             }
         }
-        
+
         // Prevent deletion of admin accounts
         if ($userToDelete && $userToDelete['role'] === 'admin') {
             return false; // Cannot delete admin accounts
         }
-        
+
         // Find and remove the user
         $filteredUsers = array_filter($users, function($user) use ($userId) {
             return $user['id'] !== $userId;
         });
-        
+
         // Check if user was found and removed
         if (count($filteredUsers) === count($users)) {
             return false; // User not found
         }
-        
-        return self::saveUsers(array_values($filteredUsers));
+
+        $fileDeleted = self::saveUsers(array_values($filteredUsers));
+
+        // If file deletion succeeded, also delete from database and cleanup listings
+        if ($fileDeleted) {
+            self::deleteDatabaseUser($userId);
+        }
+
+        return $fileDeleted;
+    }
+
+    private static function deleteDatabaseUser(int $userId): void
+    {
+        try {
+            $pdo = \App\Core\Database::pdo();
+
+            // Delete all listings for this user first
+            $listing = new \App\Models\Listing();
+            $deletedListings = $listing->deleteBySellerId($userId);
+            if ($deletedListings > 0) {
+                error_log("Deleted {$deletedListings} listings for user ID: {$userId}");
+            }
+
+            // Delete user profile
+            $pdo->prepare("DELETE FROM user_profiles WHERE user_id = ?")->execute([$userId]);
+
+            // Delete user record
+            $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$userId]);
+
+            error_log("Deleted database user and profile for user ID: {$userId}");
+
+        } catch (\PDOException $e) {
+            error_log('Failed to delete database user: ' . $e->getMessage());
+        } catch (Exception $e) {
+            error_log('Failed to delete database user: ' . $e->getMessage());
+        }
+    }
+
+    public static function cleanupOrphanedListings(): int
+    {
+        try {
+            $listing = new \App\Models\Listing();
+            $deletedCount = $listing->cleanupOrphanedListings();
+            error_log("Cleanup orphaned listings: Deleted {$deletedCount} listings");
+            return $deletedCount;
+        } catch (Exception $e) {
+            error_log('Failed to cleanup orphaned listings: ' . $e->getMessage());
+            return 0;
+        }
     }
 
     public static function saveUsers(array $users): bool

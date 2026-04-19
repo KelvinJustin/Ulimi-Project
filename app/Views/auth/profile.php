@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/app.css">
+  <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/output.css">
   <link rel="icon" type="image/svg+xml" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/favicon.svg">
   <link rel="alternate icon" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/favicon.ico">
   <style>
@@ -274,6 +275,11 @@
         font-size: 0.85rem;
       }
     }
+
+    /* Footer integration */
+    footer {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body class="profile-page">
@@ -300,17 +306,19 @@
       <div class="form-group">
         <label for="display_name">Display Name</label>
         <input type="text" id="display_name" name="display_name"
-               value="<?= htmlspecialchars(ucfirst($user['display_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" 
+               value="<?= htmlspecialchars($old['display_name'] ?? ucfirst($user['display_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                required>
         <div class="info-text">This is how your name will appear to other users</div>
+        <?php if (!empty($errors['display_name'])): ?><div class="error" style="color: #dc2626; font-size: 0.9rem; margin-top: 0.5rem;"><?= htmlspecialchars($errors['display_name'], ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
       </div>
 
       <div class="form-group">
         <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" 
-               value="<?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-               readonly>
-        <div class="info-text">Email cannot be changed. Contact support if needed.</div>
+        <input type="email" id="email" name="email"
+               value="<?= htmlspecialchars($old['email'] ?? $user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+               required>
+        <div class="info-text">Your email address for notifications and login</div>
+        <?php if (!empty($errors['email'])): ?><div class="error" style="color: #dc2626; font-size: 0.9rem; margin-top: 0.5rem;"><?= htmlspecialchars($errors['email'], ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
       </div>
 
       <div class="form-group">
@@ -325,9 +333,15 @@
 
       <div class="form-group">
         <label for="bio">Bio</label>
-        <textarea id="bio" name="bio" placeholder="Tell us about yourself..."><?= htmlspecialchars($user['bio'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <textarea id="bio" name="bio" placeholder="Tell us about yourself..."><?= htmlspecialchars($old['bio'] ?? $user['bio'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
         <div class="info-text">Optional: Share information about yourself or your business</div>
       </div>
+
+      <?php if (!empty($errors['general'])): ?>
+        <div class="error" style="color: #dc2626; padding: 1rem; background: #fee2e2; border-radius: 8px; margin-bottom: 1rem;">
+          <?= htmlspecialchars($errors['general'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+      <?php endif; ?>
 
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" onclick="window.location.href='<?= $base ?>/dashboard'">
@@ -343,15 +357,22 @@
   <?php require APP_PATH . '/Views/partials/footer-tailwind.php'; ?>
 
   <script>
-    // Form submission handler
+    // Form validation
     document.querySelector('.profile-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Show success message (in production, this would submit to server)
-      alert('Profile updated successfully! (Note: This is a demo - actual update functionality needs backend implementation)');
-      
-      // Redirect to dashboard
-      window.location.href = '<?= $base ?>/dashboard';
+      const displayName = document.getElementById('display_name').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (displayName.length < 3) {
+        e.preventDefault();
+        alert('Display name must be at least 3 characters.');
+        return;
+      }
+
+      if (!email.includes('@') || !email.includes('.')) {
+        e.preventDefault();
+        alert('Please enter a valid email address.');
+        return;
+      }
     });
   </script>
 </body>

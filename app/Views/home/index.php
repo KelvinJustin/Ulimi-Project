@@ -47,6 +47,88 @@
       opacity: 0.7;
       transform: scale(0.98);
     }
+
+    /* Morph Effect Styles */
+    .morph-container {
+      position: relative;
+      font-size: clamp(3rem, 15vw, 10rem);
+      font-weight: 700;
+      filter: url(#threshold);
+      user-select: none;
+      width: 100%;
+      text-align: center;
+    }
+
+    .word-rotator {
+      position: relative;
+      height: 1.2em;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .word {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      color: var(--text, #1a3d22);
+      white-space: nowrap;
+      animation: rotate-words 9s infinite ease-in-out;
+    }
+
+    .word:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .word:nth-child(2) {
+      animation-delay: 3s;
+    }
+
+    .word:nth-child(3) {
+      animation-delay: 6s;
+    }
+
+    @keyframes rotate-words {
+      0% {
+        opacity: 0;
+        filter: blur(20px);
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+
+      5% {
+        opacity: 0.5;
+        filter: blur(10px);
+      }
+
+      15%,
+      35% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      45% {
+        opacity: 0.5;
+        filter: blur(10px);
+      }
+
+      50%,
+      100% {
+        opacity: 0;
+        filter: blur(20px);
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+    }
+
+    .filters {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body class="m-0 p-0">
@@ -57,21 +139,41 @@
 
   <?php require APP_PATH . '/Views/partials/header-tailwind.php'; ?>
 
+  <!-- Threshold Filter for Morph Effect -->
+  <svg class="filters">
+    <defs>
+      <filter id="threshold">
+        <!-- Alpha thresholding -->
+        <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 25 -9" result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+    </defs>
+  </svg>
+
   <section class="min-h-screen bg-cream flex flex-col relative overflow-hidden" id="top">
     <div class="absolute inset-0">
       <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 50% at 70% 40%, rgba(52,126,68,0.08) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(190,158,71,0.07) 0%, transparent 60%);"></div>
     </div>
     <div class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(to right, rgba(26,61,34,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(26,61,34,0.04) 1px, transparent 1px); background-size: 80px 80px; mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);"></div>
 
-    <div class="flex-1 flex items-center pt-24 pb-20">
+    <div class="flex-1 flex items-center pt-16 pb-20">
       <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 w-full box-border text-center">
         <div>
-          <h1 class="font-head text-[clamp(40px,5vw,62px)] leading-[1.1] tracking-[-1.5px] text-charcoal mb-[22px]">
-            The Best <em class="italic text-leaf">Agricultural</em>
-            <strong>Platform in Malawi</strong>
-          </h1>
+          <div class="morph-container font-head mb-[22px] mx-auto">
+            <div class="word-rotator">
+              <div class="word">CONNECT</div>
+              <div class="word">TRADE</div>
+              <div class="word">ULIMI</div>
+            </div>
+          </div>
+          <h2 class="font-head text-[clamp(25px,6vw,24px)] leading-[1.2] tracking-[-1px] text-leaf font-bold mb-4 max-w-[600px] mx-auto">
+            The Best Agricultural Platform in Malawi
+          </h2>
           <p class="text-base leading-[1.75] text-text-muted max-w-[600px] mx-auto mb-9">
-            Ulimi connects farmers, buyers, and suppliers in real-time — enabling seamless trade through mobile device-based negotiations or digital listings, with AI-powered translation, live price tracking, and secure transactions.
+            Ulimi connects farmers, buyers, and suppliers in real-time — enabling seamless trade through mobile device-based negotiations, digital listings, live price tracking, and secure transactions.
           </p>
           <div class="flex items-center justify-center gap-3.5 flex-wrap">
             <a href="/register" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-[50px] font-body text-base font-medium cursor-pointer text-decoration-none border-none bg-leaf text-white transition-all duration-280 ease-custom hover:bg-leaf-light hover:-translate-y-0.5 hover:shadow-lg">
@@ -81,15 +183,15 @@
           </div>
           <div class="flex gap-8 mt-12 pt-8 border-t border-earth/12 justify-center">
             <div>
-              <div class="font-head text-[28px] text-leaf leading-none">8,800+</div>
+              <div class="font-head text-[28px] text-leaf leading-none counter" data-target="8800">0</div>
               <div class="text-xs text-text-muted mt-1 uppercase tracking-[0.5px]">Companies Registered</div>
             </div>
             <div>
-              <div class="font-head text-[28px] text-leaf leading-none">1750+</div>
+              <div class="font-head text-[28px] text-leaf leading-none counter" data-target="1750">0</div>
               <div class="text-xs text-text-muted mt-1 uppercase tracking-[0.5px]">Services</div>
             </div>
             <div>
-              <div class="font-head text-[28px] text-leaf leading-none">100%</div>
+              <div class="font-head text-[28px] text-leaf leading-none counter" data-target="100" data-suffix="%">0%</div>
               <div class="text-xs text-text-muted mt-1 uppercase tracking-[0.5px]">Deal Protection</div>
             </div>
           </div>
@@ -151,7 +253,7 @@
   <section class="mt-12 py-12 lg:py-16" id="audience" style="background-color: #f2ede4; background-image: linear-gradient(#e5e0d5 1px, transparent 1px), linear-gradient(90deg, #e5e0d5 1px, transparent 1px); background-size: 100px 100px;">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 w-full box-border">
       <div class="inline-block text-xs font-medium uppercase tracking-[1.5px] text-leaf mb-6 mt-8 scroll-animate">Who is Ulimi for?</div>
-      <h2 class="font-head text-[clamp(32px,4vw,48px)] leading-[1.15] tracking-[-1px] text-charcoal mb-8 scroll-animate">Built for every role<br>in the ag supply chain</h2>
+      <h2 class="font-head text-[clamp(32px,4vw,48px)] leading-[1.15] tracking-[-1px] text-charcoal mb-8 scroll-animate">Built for every role<br>in the agricultural supply chain</h2>
       <div class="flex flex-wrap gap-3 my-10">
         <button class="tab-btn px-6 py-3 rounded-[50px] font-body text-base font-medium cursor-pointer text-decoration-none border-none transition-all duration-280 ease-custom bg-leaf text-white" data-tab="farmers">For Farmers</button>
         <button class="tab-btn px-6 py-3 rounded-[50px] font-body text-base font-medium cursor-pointer text-decoration-none border-none transition-all duration-280 ease-custom bg-white text-charcoal border border-earth/12 hover:border-leaf hover:text-leaf" data-tab="wholesalers">Wholesalers &amp; Brokers</button>
@@ -472,6 +574,40 @@
       // Observe all animate elements
       const animateElements = document.querySelectorAll('.scroll-animate, .scroll-animate-scale');
       animateElements.forEach(el => observer.observe(el));
+
+      // Counter animation
+      const counters = document.querySelectorAll('.counter');
+      
+      function animateCounter(counter) {
+        const target = +counter.getAttribute('data-target');
+        const suffix = counter.getAttribute('data-suffix') || '';
+        const addPlus = !suffix && counter.textContent.includes('+');
+        const duration = 2000; // 2 seconds
+        const increment = target / (duration / 16); // 60fps
+        let current = 0;
+
+        const updateCounter = () => {
+          current += increment;
+          if (current < target) {
+            const displayValue = Math.ceil(current);
+            counter.textContent = displayValue.toLocaleString() + suffix + (addPlus && displayValue >= target ? '+' : '');
+            requestAnimationFrame(updateCounter);
+          } else {
+            counter.textContent = target.toLocaleString() + suffix + (addPlus ? '+' : '');
+          }
+        };
+
+        updateCounter();
+      }
+
+      // Start counter animation when page loads
+      setTimeout(() => {
+        counters.forEach((counter, index) => {
+          setTimeout(() => {
+            animateCounter(counter);
+          }, index * 200); // Stagger animations
+        });
+      }, 500);
     });
   </script>
 </body>

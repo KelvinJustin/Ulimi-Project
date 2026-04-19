@@ -79,50 +79,107 @@ final class MessageController
         }
 
         $user = Auth::user();
-        $conversationId = (int)($params['id'] ?? 0);
+        $conversationId = $params['id'] ?? 0;
 
-        if ($conversationId <= 0) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Invalid conversation ID']);
-            return;
-        }
+        error_log("Fetching messages for conversation ID: $conversationId, User ID: {$user['id']}");
 
         try {
             $pdo = Database::pdo();
 
-            // Verify user is part of this conversation
-            $stmt = $pdo->prepare("
-                SELECT id FROM conversations 
-                WHERE id = ? AND (buyer_id = ? OR seller_id = ?)
-                LIMIT 1
-            ");
-            $stmt->execute([$conversationId, $user['id'], $user['id']]);
-            if (!$stmt->fetch()) {
+            // First check if conversation exists at all
+            $stmt = $pdo->prepare("SELECT id, buyer_id, seller_id FROM conversations WHERE id = ?");
+            $stmt->execute([$conversationId]);
+            $conversation = $stmt->fetch();
+
+            if (!$conversation) {
+                error_log("Conversation $conversationId not found");
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Conversation not found']);
+                return;
+            }
+
+            error_log("Conversation exists: buyer_id={$conversation['buyer_id']}, seller_id={$conversation['seller_id']}");
+
+            // Verify user is part of the conversation
+            if ($conversation['buyer_id'] != $user['id'] && $conversation['seller_id'] != $user['id']) {
+                error_log("User {$user['id']} not authorized for conversation $conversationId");
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Access denied']);
                 return;
             }
 
-            // Fetch messages
+            // Get the other user's ID
+            $otherUserId = ($conversation['buyer_id'] == $user['id']) ? $conversation['seller_id'] : $conversation['buyer_id'];
+
+            // Fetch other user's name
             $stmt = $pdo->prepare("
-                SELECT 
+                SELECT up.display_name as other_name, up.avatar_path as other_avatar
+                FROM user_profiles up
+                WHERE up.user_id = ?
+            ");
+            $stmt->execute([$otherUserId]);
+            $otherUser = $stmt->fetch();
+
+            if ($otherUser) {
+                $conversation['other_name'] = $otherUser['other_name'];
+                $conversation['other_avatar'] = $otherUser['other_avatar'];
+            } else {
+                $conversation['other_name'] = 'Unknown';
+                $conversation['other_avatar'] = null;
+            }
+
+            // Fetch listing title if exists
+            $stmt = $pdo->prepare("
+                SELECT title as listing_title
+                FROM commodity_listings
+                WHERE id = (SELECT listing_id FROM conversations WHERE id = ?)
+            ");
+            $stmt->execute([$conversationId]);
+            $listing = $stmt->fetch();
+            if ($listing) {
+                $conversation['listing_title'] = $listing['listing_title'];
+            }
+
+            error_log("User authorized, fetching messages...");
+
+            // Mark messages as read for this user
+            $stmt = $pdo->prepare("
+                UPDATE messages
+                SET is_read = 1
+                WHERE conversation_id = ?
+                AND sender_id != ?
+                AND is_read = 0
+            ");
+            $stmt->execute([$conversationId, $user['id']]);
+
+            // Fetch messages for this conversation
+            $stmt = $pdo->prepare("
+                SELECT
                     m.id,
+                    m.conversation_id,
                     m.sender_id,
                     m.message_text,
                     m.image_path,
+                    m.offer_price_per_unit,
+                    m.currency,
                     m.created_at,
-                    up.display_name as sender_name
+                    up.display_name as sender_name,
+                    up.avatar_path as sender_avatar
                 FROM messages m
-                LEFT JOIN user_profiles up ON m.sender_id = up.user_id
+                JOIN users u ON m.sender_id = u.id
+                LEFT JOIN user_profiles up ON u.id = up.user_id
                 WHERE m.conversation_id = ?
                 ORDER BY m.created_at ASC
             ");
             $stmt->execute([$conversationId]);
             $messages = $stmt->fetchAll();
 
-            echo json_encode(['success' => true, 'messages' => $messages]);
+            error_log("Fetched " . count($messages) . " messages");
+
+            echo json_encode(['success' => true, 'messages' => $messages, 'conversation' => $conversation]);
 
         } catch (\PDOException $e) {
+            error_log('Error fetching messages: ' . $e->getMessage());
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
         }
@@ -170,10 +227,10 @@ final class MessageController
                 return;
             }
 
-            // Insert message
+            // Insert the message (is_read = 0 by default)
             $stmt = $pdo->prepare("
-                INSERT INTO messages (conversation_id, sender_id, message_text)
-                VALUES (?, ?, ?)
+                INSERT INTO messages (conversation_id, sender_id, message_text, is_read)
+                VALUES (?, ?, ?, 0)
             ");
             $stmt->execute([$conversationId, $user['id'], $messageText]);
 
@@ -251,13 +308,14 @@ final class MessageController
         try {
             $pdo = Database::pdo();
 
-            // Count unread messages
+            // Count unread messages (is_read = 0 and sender is not current user)
             $stmt = $pdo->prepare("
                 SELECT COUNT(*) as unread_count
                 FROM messages m
                 JOIN conversations c ON m.conversation_id = c.id
                 WHERE (c.buyer_id = ? OR c.seller_id = ?)
                 AND m.sender_id != ?
+                AND m.is_read = 0
             ");
             $stmt->execute([$user['id'], $user['id'], $user['id']]);
             $result = $stmt->fetch();

@@ -11,97 +11,64 @@ final class MessagesController
 {
     public function index(): void
     {
-        // Require authentication
+        // Require authentication and seller role
         if (!Auth::check()) {
             Auth::redirectToLogin();
             return;
         }
 
         $user = Auth::user();
-        
+
+        if ($user['role'] !== 'seller') {
+            http_response_code(403);
+            echo 'Access denied. Sellers only.';
+            return;
+        }
+
         try {
             $pdo = Database::pdo();
-            
-            // Determine if user is buyer or seller and fetch conversations accordingly
-            if ($user['role'] === 'seller') {
-                // Seller's conversations with buyers
-                $stmt = $pdo->prepare("
-                    SELECT 
-                        c.id as conversation_id,
-                        c.buyer_id,
-                        c.seller_id,
-                        c.listing_id,
-                        c.created_at as conversation_created_at,
-                        up.display_name as other_name,
-                        up.avatar_path as other_avatar,
-                        cl.title as listing_title,
-                        u.slug as seller_slug,
-                        (
-                            SELECT m.message_text 
-                            FROM messages m 
-                            WHERE m.conversation_id = c.id 
-                            ORDER BY m.created_at DESC 
-                            LIMIT 1
-                        ) as last_message,
-                        (
-                            SELECT m.created_at 
-                            FROM messages m 
-                            WHERE m.conversation_id = c.id 
-                            ORDER BY m.created_at DESC 
-                            LIMIT 1
-                        ) as last_message_time
-                    FROM conversations c
-                    LEFT JOIN user_profiles up ON c.buyer_id = up.user_id
-                    LEFT JOIN commodity_listings cl ON c.listing_id = cl.id
-                    LEFT JOIN users u ON c.seller_id = u.id
-                    WHERE c.seller_id = ?
-                    ORDER BY COALESCE(last_message_time, c.created_at) DESC
-                ");
-                $stmt->execute([$user['id']]);
-            } else {
-                // Buyer's conversations with sellers
-                $stmt = $pdo->prepare("
-                    SELECT 
-                        c.id as conversation_id,
-                        c.buyer_id,
-                        c.seller_id,
-                        c.listing_id,
-                        c.created_at as conversation_created_at,
-                        up.display_name as other_name,
-                        up.avatar_path as other_avatar,
-                        cl.title as listing_title,
-                        u.slug as seller_slug,
-                        (
-                            SELECT m.message_text 
-                            FROM messages m 
-                            WHERE m.conversation_id = c.id 
-                            ORDER BY m.created_at DESC 
-                            LIMIT 1
-                        ) as last_message,
-                        (
-                            SELECT m.created_at 
-                            FROM messages m 
-                            WHERE m.conversation_id = c.id 
-                            ORDER BY m.created_at DESC 
-                            LIMIT 1
-                        ) as last_message_time
-                    FROM conversations c
-                    LEFT JOIN user_profiles up ON c.seller_id = up.user_id
-                    LEFT JOIN commodity_listings cl ON c.listing_id = cl.id
-                    LEFT JOIN users u ON c.seller_id = u.id
-                    WHERE c.buyer_id = ?
-                    ORDER BY COALESCE(last_message_time, c.created_at) DESC
-                ");
-                $stmt->execute([$user['id']]);
-            }
-            
+
+            // Fetch seller's conversations with buyers
+            $stmt = $pdo->prepare("
+                SELECT
+                    c.id as conversation_id,
+                    c.buyer_id,
+                    c.seller_id,
+                    c.listing_id,
+                    c.created_at as conversation_created_at,
+                    up.display_name as other_name,
+                    up.avatar_path as other_avatar,
+                    cl.title as listing_title,
+                    u.slug as seller_slug,
+                    (
+                        SELECT m.message_text
+                        FROM messages m
+                        WHERE m.conversation_id = c.id
+                        ORDER BY m.created_at DESC
+                        LIMIT 1
+                    ) as last_message,
+                    (
+                        SELECT m.created_at
+                        FROM messages m
+                        WHERE m.conversation_id = c.id
+                        ORDER BY m.created_at DESC
+                        LIMIT 1
+                    ) as last_message_time
+                FROM conversations c
+                LEFT JOIN user_profiles up ON c.buyer_id = up.user_id
+                LEFT JOIN commodity_listings cl ON c.listing_id = cl.id
+                LEFT JOIN users u ON c.seller_id = u.id
+                WHERE c.seller_id = ?
+                ORDER BY COALESCE(last_message_time, c.created_at) DESC
+            ");
+            $stmt->execute([$user['id']]);
             $conversations = $stmt->fetchAll();
 
             View::render('messages.inbox', [
                 'title' => 'Messages',
                 'conversations' => $conversations,
                 'user' => $user,
-                'isSeller' => $user['role'] === 'seller'
+                'isSeller' => true
             ]);
 
         } catch (\PDOException $e) {
@@ -110,7 +77,7 @@ final class MessagesController
                 'title' => 'Messages',
                 'conversations' => [],
                 'user' => $user,
-                'isSeller' => $user['role'] === 'seller',
+                'isSeller' => true,
                 'error' => 'Failed to load messages'
             ]);
         }
@@ -154,13 +121,20 @@ final class MessagesController
             $conversation = $stmt->fetch();
 
             if (!$conversation) {
-                http_response_code(403);
-                echo 'Access denied';
+                http_response_code(404);
+                echo 'Conversation not found';
                 return;
             }
 
-            // Mark messages as read (update read status - would need read_receipts table)
-            // For now, just fetch the messages
+            // Mark messages as read for this user
+            $stmt = $pdo->prepare("
+                UPDATE messages
+                SET is_read = 1
+                WHERE conversation_id = ?
+                AND sender_id != ?
+                AND is_read = 0
+            ");
+            $stmt->execute([$conversationId, $user['id']]);
 
             // Fetch conversation details
             $stmt = $pdo->prepare("

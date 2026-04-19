@@ -21,22 +21,13 @@ return array (
   2 => 
   array (
     'id' => 5,
-    'email' => 'jacob@gmail.com',
+    'email' => 'gerald@gmail.com',
     'password' => '$2y$10$6kjpdzGGbI0ez/ns0zGa0OGzMzahNnSNyT3ktHQ7yuafdh14fh/YK',
-    'display_name' => 'Jacob',
+    'display_name' => 'Gerald',
     'role' => 'seller',
     'created_at' => '2026-04-14 18:19:33',
   ),
   3 => 
-  array (
-    'id' => 6,
-    'email' => 'sumani@gmail.cpm',
-    'password' => '$2y$10$hlGUYhoL33ZT7pH9i..jjOPN3hiNB60DH3qd205S6vpCNCDN5S6XO',
-    'display_name' => 'sumani',
-    'role' => 'buyer',
-    'created_at' => '2026-04-15 09:16:20',
-  ),
-  4 => 
   array (
     'id' => 7,
     'email' => 'Kanye@gmail.com',
@@ -45,40 +36,49 @@ return array (
     'role' => 'buyer',
     'created_at' => '2026-04-15 09:24:37',
   ),
-  5 => 
+  4 => 
   array (
     'id' => 8,
-    'email' => 'knthinda@gmail.com',
-    'password' => '$2y$10$Hu.N4WN3PDA0GoyBJCeP0eZXQwlGz8nAXjHF36TpPR/92q3BZpicm',
-    'display_name' => 'mula',
-    'role' => 'seller',
-    'created_at' => '2026-04-15 09:25:16',
+    'email' => 'azure@gmail.com',
+    'password' => '$2y$10$8Z.ROpBfmfny3/6VB7yV2OzjAAiuPTN2QmUystCa/NttX8b2B7ftW',
+    'display_name' => 'azure',
+    'role' => 'buyer',
+    'created_at' => '2026-04-18 15:33:00',
+  ),
+  5 => 
+  array (
+    'id' => 9,
+    'email' => 'Earnest@gmail.com',
+    'password' => '$2y$10$ekLWD1yJnZ7evpkXii/8luZxHmuR/Vd2pvps74e05R0ukFWqADyp6',
+    'display_name' => 'Earnest',
+    'role' => 'buyer',
+    'created_at' => '2026-04-18 17:12:39',
   ),
   6 => 
   array (
-    'id' => 9,
-    'email' => 'maddie@gmail.com',
-    'password' => '$2y$10$npElmROl7BqKOucMmDJK/Op4wsOAakZ3iJTj0XkPE/hfg6cekhKoC',
-    'display_name' => 'maddie',
+    'id' => 10,
+    'email' => 'miko@gmail.com',
+    'password' => '$2y$10$riJFAo6cqYQrjHdYPik/9O0OcgOmIbcprVCm4sU3UtKFozR3HAtz6',
+    'display_name' => 'miko',
     'role' => 'buyer',
-    'created_at' => '2026-04-15 20:46:44',
+    'created_at' => '2026-04-19 09:21:37',
   ),
   7 => 
   array (
-    'id' => 10,
-    'email' => 'gyuh@gmail.com',
-    'password' => '$2y$10$h1Ufnr.CIUL67V0hCDlYnuyXd9ZJqfuqiJfnMKyJ.YOecGwxfw6wK',
-    'display_name' => 'gyuji',
-    'role' => 'seller',
-    'created_at' => '2026-04-15 20:54:15',
+    'id' => 11,
+    'email' => 'aira@gmail.com',
+    'password' => '$2y$10$ufWN6GNwTnERNtBiuIiFPuTFku0LNrY/Yz4hDF94qBruZ5mO1T/TG',
+    'display_name' => 'aira',
+    'role' => 'buyer',
+    'created_at' => '2026-04-19 09:28:23',
   ),
   8 => 
   array (
-    'id' => 11,
-    'email' => 'mary@gmail.com',
-    'password' => '$2y$10$eebOt8b7fZIPbPBfbHMNn.8dGxgmV7KoPn3O40.urQatrPMoEX/OC',
-    'display_name' => 'mary',
+    'id' => 12,
+    'email' => 'chloe@gmail.com',
+    'password' => '$2y$10$gSaG4dr11XSWIk.hNlFQGO9QXU4NrzlS6c22uz76Nv3Y1jiotZDH2',
+    'display_name' => 'Chloe',
     'role' => 'buyer',
-    'created_at' => '2026-04-17 23:24:39',
+    'created_at' => '2026-04-19 09:35:03',
   ),
 );

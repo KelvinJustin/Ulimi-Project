@@ -222,15 +222,26 @@ async function updateNotificationBadge() {
     try {
         const response = await fetch(`${API_BASE}/api/messages/unread-count`);
         const data = await response.json();
-        
+
         if (data.success) {
             const badge = document.getElementById('messageBadge');
+            const mobileBadge = document.getElementById('mobileMessageBadge');
+
             if (badge) {
-                if (data.count > 0) {
-                    badge.textContent = data.count;
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
                     badge.classList.remove('hidden');
                 } else {
                     badge.classList.add('hidden');
+                }
+            }
+
+            if (mobileBadge) {
+                if (data.unread_count > 0) {
+                    mobileBadge.textContent = data.unread_count;
+                    mobileBadge.classList.remove('hidden');
+                } else {
+                    mobileBadge.classList.add('hidden');
                 }
             }
         }
@@ -243,4 +254,11 @@ async function updateNotificationBadge() {
 function startNotificationPolling() {
     updateNotificationBadge();
     setInterval(updateNotificationBadge, 10000); // Check every 10 seconds
+}
+
+// Start notification polling on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startNotificationPolling);
+} else {
+    startNotificationPolling();
 }
