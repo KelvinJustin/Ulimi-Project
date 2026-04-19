@@ -86,6 +86,7 @@ final class WebRoutes
         $router->post('/listings/reject', fn(Request $req) => $product->rejectListing($req));
         $router->post('/listings/archive', fn(Request $req) => $product->archiveListing($req));
         $router->get('/admin/pending-listings', fn() => $product->getPendingListings());
+        $router->get('/admin/all-listings', fn() => $product->getAllListings());
         
         // API routes
         $api = new ApiController();

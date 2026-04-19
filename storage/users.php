@@ -81,4 +81,13 @@ return array (
     'role' => 'buyer',
     'created_at' => '2026-04-19 09:35:03',
   ),
+  9 => 
+  array (
+    'id' => 13,
+    'email' => 'madamalija@gmail.com',
+    'password' => '$2y$10$cspTcHmlHypE/SCTSqXsMONJGVScp0ZR3yw96.TtmwEKMh0vQwen.',
+    'display_name' => 'Madds',
+    'role' => 'buyer',
+    'created_at' => '2026-04-19 10:49:35',
+  ),
 );

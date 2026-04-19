@@ -5,486 +5,325 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($title ?? 'Ulimi Marketplace', ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/app.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/output.css">
   <link rel="icon" type="image/png" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/logo.png">
   <style>
-    /* Marketplace site page scoped styles */
-    .marketplace-site-page {
-      --marketplace-bg: #f2ede4;
-      --marketplace-card-bg: rgba(255,255,255,0.92);
-      --marketplace-border: rgba(171,175,159,0.2);
-      --marketplace-text: #1a3d22;
-      --marketplace-accent: #347e44;
-      --marketplace-subtle: #abaf9f;
-      background: var(--marketplace-bg);
-      background-image: linear-gradient(to right, rgba(26,61,34,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(26,61,34,0.04) 1px, transparent 1px);
-      background-size: 80px 80px;
-      color: var(--marketplace-text);
-      font-family: 'DM Sans', sans-serif;
-      line-height: 1.6;
+    body { font-family: 'Manrope', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
-
-    /* Fresh logo styles for marketplace site */
-    .marketplace-site-page header .logo {
-      display: flex !important;
-      align-items: center !important;
-      text-decoration: none !important;
-      color: var(--earth) !important;
-      font-weight: 600 !important;
-      font-size: 1.5rem !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+    .atmospheric-shadow {
+      box-shadow: 0px 12px 32px rgba(26, 61, 34, 0.06);
     }
-
-    .marketplace-site-page header .logo-mark {
-      width: 32px !important;
-      height: 32px !important;
-      margin-right: 12px !important;
-      background: var(--leaf) !important;
-      border-radius: 50% !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-
-    .marketplace-site-page header .logo-mark svg {
-      width: 20px !important;
-      height: 20px !important;
-      fill: white !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      display: block !important;
-    }
-
-    .marketplace-section {
-      padding: 80px 0;
-    }
-
-    .marketplace-container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .cta-btn {
-      display: inline-block;
-      padding: 12px 28px;
-      background: #347e44;
-      color: white;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 500;
-      transition: all 0.3s;
-      border: 2px solid #347e44;
-      font-size: 0.95rem;
-    }
-
-    .cta-btn:hover {
-      background: transparent;
-      color: #347e44;
-    }
-
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2.5rem;
-      font-weight: 400;
-      text-align: center;
-      margin-bottom: 3rem;
-      color: #1a3d22;
-    }
-
-    /* Categories Section */
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-    }
-
-    .category-card {
-      background: #f2ede4;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(26,61,34,0.08);
-      border: 1px solid rgba(171,175,159,0.3);
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .category-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(26,61,34,0.15);
-      border-color: #347e44;
-    }
-
-    .category-icon {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 1.5rem;
-      background: linear-gradient(135deg, #347e44 0%, #1a3d22 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-      color: white;
-    }
-
-    .category-card h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.4rem;
-      margin-bottom: 0.75rem;
-      color: #1a3d22;
-    }
-
-    .category-card p {
-      color: #abaf9f;
-      margin-bottom: 1rem;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .category-features {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 1.5rem 0;
-      text-align: left;
-    }
-
-    .category-features li {
-      color: #1a3d22;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-      padding-left: 1.5rem;
-      position: relative;
-      line-height: 1.4;
-    }
-
-    .category-features li::before {
-      content: '•';
-      position: absolute;
-      left: 0;
-      color: #347e44;
-      font-weight: bold;
-    }
-
-    /* Why Use Section */
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .why-item {
-      background: white;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(26,61,34,0.08);
-      border: 1px solid rgba(171,175,159,0.3);
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .why-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(26,61,34,0.15);
-      border-color: #347e44;
-    }
-
-    .why-icon {
-      width: 60px;
-      height: 60px;
-      margin: 0 auto 1rem;
-      background: linear-gradient(135deg, #347e44 0%, #1a3d22 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: white;
-    }
-
-    .why-item h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-      color: #1a3d22;
-    }
-
-    .why-item p {
-      color: #abaf9f;
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    /* Stats Section - Horizontal Row */
-    .stats-section {
-      background: linear-gradient(135deg, rgba(52,126,68,0.05) 0%, rgba(190,158,71,0.04) 100%);
-      padding: 80px 0;
-    }
-
-    .stats-row {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      gap: 2rem;
-      text-align: center;
-    }
-
-    .stat-item {
-      flex: 1;
-      min-width: 200px;
-      padding: 1rem;
-    }
-
-    .stat-number {
-      font-family: 'DM Serif Display', serif;
-      font-size: 3rem;
-      font-weight: 400;
-      margin-bottom: 0.5rem;
-      color: #347e44;
-    }
-
-    .stat-label {
-      font-size: 1.1rem;
-      color: #abaf9f;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .categories-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .why-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-row {
-        flex-direction: column;
-      }
-
-      .stat-item {
-        min-width: 100%;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .marketplace-section {
-        padding: 60px 0;
-      }
-
-      .section-title {
-        font-size: 2rem;
-      }
-
-      .category-card,
-      .why-item {
-        padding: 1.5rem;
-      }
-
-      .stat-number {
-        font-size: 2.5rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .section-title {
-        font-size: 1.75rem;
-      }
-
-      .category-card,
-      .why-item {
-        padding: 1.25rem;
-      }
-
-      .stat-number {
-        font-size: 2rem;
-      }
-
-      .stat-label {
-        font-size: 0.95rem;
-      }
-    }
-</style>
+  </style>
 </head>
-<body>
+<body class="bg-[#fef9f0] text-[#1d1c16]">
 
 <?php require APP_PATH . '/Views/partials/header-tailwind.php'; ?>
   <?php $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/'); ?>
 
-  <!-- Marketplace Categories Section -->
-  <section class="marketplace-section">
-    <div class="marketplace-container">
-      <h2 class="section-title">Marketplace Categories</h2>
-      <div class="categories-grid">
-        <div class="category-card">
-          <div class="category-icon"><i class="fa fa-seedling"></i></div>
-          <h3>Grains & Cereals</h3>
-          <p>Wheat, maize, rice, soybeans, and other staple crops from verified suppliers.</p>
-          <ul class="category-features">
-            <li>Bulk & wholesale options</li>
-            <li>Regional availability</li>
-            <li>Quality grades listed</li>
-          </ul>
-          <?php if (\App\Core\Auth::check()): ?>
-            <a href="<?= $base ?>/browse" class="cta-btn">Browse Listings</a>
-          <?php else: ?>
-            <a href="<?= $base ?>/register" class="cta-btn">Browse Listings</a>
-          <?php endif; ?>
+  <!-- Hero Section -->
+  <section class="relative pt-8 pb-24 md:pt-8 md:pb-40 overflow-hidden px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
+      <div class="flex-1 z-10">
+        <span class="inline-block px-4 py-1.5 mb-6 rounded-full bg-[#fdd97b] text-[#785d06] text-[0.75rem] font-bold uppercase tracking-wider">Marketplace</span>
+        <h1 class="text-3xl md:text-5xl font-bold text-[#1d1c16] leading-[1.1] tracking-tight mb-8">
+          The Future of <span class="text-[#16642e] italic">Malawi's</span> Agricultural Trade
+        </h1>
+        <p class="text-lg md:text-xl text-[#40493f] max-w-xl mb-10 leading-relaxed">
+          Connect directly with verified farmers and commercial buyers. A transparent, secure ecosystem designed to digitize the heart of our economy.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="<?= $base ?>/browse" class="bg-gradient-to-br from-[#16642e] to-[#347e44] text-white px-8 py-4 rounded-full font-bold text-lg atmospheric-shadow hover:scale-105 transition-transform">Explore Marketplace</a>
+          <a href="<?= $base ?>/register" class="bg-[#ece8df] text-[#1d1c16] px-8 py-4 rounded-full font-bold text-lg hover:bg-[#e7e2d9] transition-colors">Sell Your Produce</a>
+        </div>
+      </div>
+      <div class="flex-1 relative">
+        <div class="w-80% aspect-[1/5] rounded-[2.5rem] overflow-hidden atmospheric-shadow">
+          <img src="https://images.pexels.com/photos/33364793/pexels-photo-33364793/free-photo-of-vibrant-local-market-with-fresh-vegetables.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1" alt="Vibrant local market with fresh vegetables" class="w-full h-full object-cover">
+        </div>
+        <!-- Glassmorphism Stats Card -->
+        <div class="absolute -bottom-8 -left-16 md:-left-16 p-4 rounded-3xl bg-[#fef9f0]/70 backdrop-blur-xl atmospheric-shadow max-w-[168px] shadow-2xl border-4 border-[#f8f3ea]">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="material-symbols-outlined text-[#16642e] py-1.5 px-4 bg-[#347e44]/20 rounded-xl text-lg">trending_up</span>
+            <span class="text-[10px] font-bold text-[#40493f] uppercase tracking-widest">Market Volume</span>
+          </div>
+          <div class="text-2xl font-extrabold text-[#1d1c16] tracking-tighter">+MK 200.4M</div>
+          <div class="text-xs text-[#40493f]">Trade volume processed this season</div>
+        </div>
+      </div>
+    </div>
+    <!-- Abstract Background Shape -->
+    <div class="absolute top-0 right-0 -z-10 w-2/3 h-full bg-[#f8f3ea] rounded-bl-[10rem]"></div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 bg-[#16642e] text-white">
+    <div class="max-w-7xl mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="text-center">
+        <div class="text-4xl md:text-5xl font-extrabold mb-1 tracking-tighter">8,800+</div>
+        <div class="text-[#8bd894] text-sm font-medium uppercase tracking-widest">Active Businesses</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl md:text-5xl font-extrabold mb-1 tracking-tighter">2,400+</div>
+        <div class="text-[#8bd894] text-sm font-medium uppercase tracking-widest">Live Listings</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl md:text-5xl font-extrabold mb-1 tracking-tighter">1,700+</div>
+        <div class="text-[#8bd894] text-sm font-medium uppercase tracking-widest">Products</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl md:text-5xl font-extrabold mb-1 tracking-tighter">100%</div>
+        <div class="text-[#8bd894] text-sm font-medium uppercase tracking-widest">Secure</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="py-24 px-8 bg-[#fef9f0]">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div class="max-w-2xl">
+          <span class="text-[#16642e] font-bold text-sm tracking-[0.2em] uppercase mb-4 block">Our Ecosystem</span>
+          <h2 class="text-4xl md:text-5xl font-bold text-[#1d1c16] tracking-tight leading-tight">Marketplace Categories</h2>
+        </div>
+        <p class="text-[#40493f] text-lg max-w-sm">From industrial machinery to heritage seeds, we facilitate the entire agricultural value chain.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Category 1 -->
+        <div class="group flex flex-col bg-[#ffffff] rounded-[2rem] overflow-hidden atmospheric-shadow hover:-translate-y-2 transition-transform duration-300">
+          <div class="h-48 overflow-hidden">
+            <img alt="Grains and Cereals" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/18404065/pexels-photo-18404065/free-photo-of-bags-with-sand.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <h3 class="text-2xl font-bold text-[#1d1c16] mb-3">Grains & Cereals</h3>
+            <p class="text-[#40493f] mb-6 text-sm leading-relaxed">High-quality bulk maize, soybeans, and rice directly from local clusters.</p>
+            <ul class="space-y-3 mb-8 flex-1">
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Grade A Maize
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Bulk Soybean Supply
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Certified Kilombero Rice
+              </li>
+            </ul>
+            <?php if (\App\Core\Auth::check()): ?>
+              <a href="<?= $base ?>/browse" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php else: ?>
+              <a href="<?= $base ?>/register" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php endif; ?>
+          </div>
         </div>
 
-        <div class="category-card">
-          <div class="category-icon"><i class="fa fa-apple"></i></div>
-          <h3>Fresh Produce</h3>
-          <p>Seasonal fruits and vegetables sourced directly from farms.</p>
-          <ul class="category-features">
-            <li>Freshness guaranteed</li>
-            <li>Fast regional delivery</li>
-            <li>Farm-to-market supply</li>
-          </ul>
-          <?php if (\App\Core\Auth::check()): ?>
-            <a href="<?= $base ?>/browse" class="cta-btn">Browse Listings</a>
-          <?php else: ?>
-            <a href="<?= $base ?>/register" class="cta-btn">Browse Listings</a>
-          <?php endif; ?>
+        <!-- Category 2 -->
+        <div class="group flex flex-col bg-[#ffffff] rounded-[2rem] overflow-hidden atmospheric-shadow hover:-translate-y-2 transition-transform duration-300">
+          <div class="h-48 overflow-hidden">
+            <img alt="Fresh Produce" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/16747109/pexels-photo-16747109/free-photo-of-fresh-vegetables-and-fruits-at-market.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <h3 class="text-2xl font-bold text-[#1d1c16] mb-3">Fresh Produce</h3>
+            <p class="text-[#40493f] mb-6 text-sm leading-relaxed">Farm-fresh vegetables and seasonal fruits harvested daily for retailers.</p>
+            <ul class="space-y-3 mb-8 flex-1">
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Organic Vegetables
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Seasonal Fruits
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Farm-to-Table Logistics
+              </li>
+            </ul>
+            <?php if (\App\Core\Auth::check()): ?>
+              <a href="<?= $base ?>/browse" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php else: ?>
+              <a href="<?= $base ?>/register" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php endif; ?>
+          </div>
         </div>
 
-        <div class="category-card">
-          <div class="category-icon"><i class="fa fa-cow"></i></div>
-          <h3>Livestock & Dairy</h3>
-          <p>Cattle, poultry, goats, milk, eggs, and meat products.</p>
-          <ul class="category-features">
-            <li>Certified producers</li>
-            <li>Health & quality standards</li>
-            <li>Live animals and processed goods</li>
-          </ul>
-          <?php if (\App\Core\Auth::check()): ?>
-            <a href="<?= $base ?>/browse" class="cta-btn">Browse Listings</a>
-          <?php else: ?>
-            <a href="<?= $base ?>/register" class="cta-btn">Browse Listings</a>
-          <?php endif; ?>
+        <!-- Category 3 -->
+        <div class="group flex flex-col bg-[#ffffff] rounded-[2rem] overflow-hidden atmospheric-shadow hover:-translate-y-2 transition-transform duration-300">
+          <div class="h-48 overflow-hidden">
+            <img alt="Livestock and Dairy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/31824306/pexels-photo-31824306/free-photo-of-close-up-of-cattle-eating-in-barn.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <h3 class="text-2xl font-bold text-[#1d1c16] mb-3">Livestock & Dairy</h3>
+            <p class="text-[#40493f] mb-6 text-sm leading-relaxed">Verified healthy livestock and premium dairy products from certified farms.</p>
+            <ul class="space-y-3 mb-8 flex-1">
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Healthy Cattle & Goats
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Fresh Milk & Poultry
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Veterinary Verified
+              </li>
+            </ul>
+            <?php if (\App\Core\Auth::check()): ?>
+              <a href="<?= $base ?>/browse" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php else: ?>
+              <a href="<?= $base ?>/register" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php endif; ?>
+          </div>
         </div>
 
-        <div class="category-card">
-          <div class="category-icon"><i class="fa fa-tractor"></i></div>
-          <h3>Farm Equipment</h3>
-          <p>Tractors, irrigation systems, tools, and machinery.</p>
-          <ul class="category-features">
-            <li>New & used equipment</li>
-            <li>Spare parts available</li>
-            <li>Rental options</li>
-          </ul>
-          <?php if (\App\Core\Auth::check()): ?>
-            <a href="<?= $base ?>/browse" class="cta-btn">Browse Listings</a>
-          <?php else: ?>
-            <a href="<?= $base ?>/register" class="cta-btn">Browse Listings</a>
-          <?php endif; ?>
+        <!-- Category 4 -->
+        <div class="group flex flex-col bg-[#ffffff] rounded-[2rem] overflow-hidden atmospheric-shadow hover:-translate-y-2 transition-transform duration-300">
+          <div class="h-48 overflow-hidden">
+            <img alt="Farm Equipment" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/32566502/pexels-photo-32566502/free-photo-of-tractor-on-farmland-at-sunset-in-india.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <h3 class="text-2xl font-bold text-[#1d1c16] mb-3">Farm Equipment</h3>
+            <p class="text-[#40493f] mb-6 text-sm leading-relaxed">Tools for modernization, from hand implements to solar irrigation systems.</p>
+            <ul class="space-y-3 mb-8 flex-1">
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Irrigation Systems
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Power Tillers & Tractors
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Post-harvest Tools
+              </li>
+            </ul>
+            <?php if (\App\Core\Auth::check()): ?>
+              <a href="<?= $base ?>/browse" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php else: ?>
+              <a href="<?= $base ?>/register" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php endif; ?>
+          </div>
         </div>
 
-        <div class="category-card">
-          <div class="category-icon"><i class="fa fa-flask"></i></div>
-          <h3>Seeds & Inputs</h3>
-          <p>Seeds, fertilizers, pesticides, and soil enhancers.</p>
-          <ul class="category-features">
-            <li>Hybrid & organic seeds</li>
-            <li>Trusted agro-dealers</li>
-            <li>Seasonal supply availability</li>
-          </ul>
-          <?php if (\App\Core\Auth::check()): ?>
-            <a href="<?= $base ?>/browse" class="cta-btn">Browse Listings</a>
-          <?php else: ?>
-            <a href="<?= $base ?>/register" class="cta-btn">Browse Listings</a>
-          <?php endif; ?>
+        <!-- Category 5 -->
+        <div class="group flex flex-col bg-[#ffffff] rounded-[2rem] overflow-hidden atmospheric-shadow hover:-translate-y-2 transition-transform duration-300">
+          <div class="h-48 overflow-hidden">
+            <img alt="Seeds and Inputs" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/33971787/pexels-photo-33971787/free-photo-of-assorted-bird-seed-mix-with-sunflower-and-corn.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <h3 class="text-2xl font-bold text-[#1d1c16] mb-3">Seeds & Inputs</h3>
+            <p class="text-[#40493f] mb-6 text-sm leading-relaxed">Foundation for growth. Quality seeds, fertilizers, and organic pest control.</p>
+            <ul class="space-y-3 mb-8 flex-1">
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> High-Yield Hybrid Seeds
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Organic Fertilizers
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Seedlings & Saplings
+              </li>
+            </ul>
+            <?php if (\App\Core\Auth::check()): ?>
+              <a href="<?= $base ?>/browse" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php else: ?>
+              <a href="<?= $base ?>/register" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php endif; ?>
+          </div>
         </div>
 
-        <div class="category-card">
-          <div class="category-icon"><i class="fa fa-box"></i></div>
-          <h3>Processed & Value-Added Goods</h3>
-          <p>Packaged foods, milled grains, oils, and agro-processed products.</p>
-          <ul class="category-features">
-            <li>Export-ready products</li>
-            <li>Certified processing standards</li>
-            <li>Bulk supply options</li>
-          </ul>
-          <?php if (\App\Core\Auth::check()): ?>
-            <a href="<?= $base ?>/browse" class="cta-btn">Browse Listings</a>
-          <?php else: ?>
-            <a href="<?= $base ?>/register" class="cta-btn">Browse Listings</a>
-          <?php endif; ?>
+        <!-- Category 6 -->
+        <div class="group flex flex-col bg-[#ffffff] rounded-[2rem] overflow-hidden atmospheric-shadow hover:-translate-y-2 transition-transform duration-300">
+          <div class="h-48 overflow-hidden">
+            <img alt="Processed Goods" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/18925018/pexels-photo-18925018/free-photo-of-selection-of-products-in-shop.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <h3 class="text-2xl font-bold text-[#1d1c16] mb-3">Processed Goods</h3>
+            <p class="text-[#40493f] mb-6 text-sm leading-relaxed">Value-added agricultural products from flour to sunflower oils.</p>
+            <ul class="space-y-3 mb-8 flex-1">
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Refined Cooking Oils
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Maize & Wheat Flour
+              </li>
+              <li class="flex items-center gap-3 text-sm font-medium text-[#1d1c16]">
+                <span class="material-symbols-outlined text-[#16642e] text-lg">check_circle</span> Packaged Spices
+              </li>
+            </ul>
+            <?php if (\App\Core\Auth::check()): ?>
+              <a href="<?= $base ?>/browse" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php else: ?>
+              <a href="<?= $base ?>/register" class="w-full py-4 rounded-xl bg-[#ece8df] text-[#1d1c16] font-bold hover:bg-[#16642e] hover:text-white transition-all text-center">Browse Listings</a>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Why Use Ulimi Marketplace Section -->
-  <section class="marketplace-section">
-    <div class="marketplace-container">
-      <h2 class="section-title">Why Use Ulimi Marketplace</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <div class="why-icon"><i class="fa fa-globe"></i></div>
-          <h3>Nationwide Market Access</h3>
-          <p>Connect with buyers and suppliers across Malawi</p>
-        </div>
-
-        <div class="why-item">
-          <div class="why-icon"><i class="fa fa-check-circle"></i></div>
-          <h3>Verified Sellers & Buyers</h3>
-          <p>Trade with trusted, screened participants</p>
-        </div>
-
-        <div class="why-item">
-          <div class="why-icon"><i class="fa fa-shield"></i></div>
-          <h3>Secure Payments</h3>
-          <p>Escrow-backed transactions for safer trading</p>
-        </div>
-
-        <div class="why-item">
-          <div class="why-icon"><i class="fa fa-chart-line"></i></div>
-          <h3>Market Prices & Trends</h3>
-          <p>Stay updated with current pricing and demand</p>
-        </div>
-
-        <div class="why-item">
-          <div class="why-icon"><i class="fa fa-mobile"></i></div>
-          <h3>Mobile-Friendly Trading</h3>
-          <p>Buy and sell easily from any device</p>
-        </div>
-
-        <div class="why-item">
-          <div class="why-icon"><i class="fa fa-credit-card"></i></div>
-          <h3>Flexible Payment Options</h3>
-          <p>Mobile money, bank transfer, and digital payments</p>
-        </div>
+  <!-- Why Use Ulimi Section -->
+  <section class="py-24 px-8 bg-[#f8f3ea] rounded-t-[5rem]">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#1d1c16] mb-6 tracking-tight">The Ulimi Advantage</h2>
+        <p class="text-[#40493f] text-lg max-w-2xl mx-auto">Digitizing agriculture with trust, transparency, and accessibility at the forefront of everything we do.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- Marketplace Stats Section -->
-  <section class="stats-section">
-    <div class="marketplace-container">
-      <h2 class="section-title">Marketplace Stats</h2>
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-number">8,800+</div>
-          <div class="stat-label">Active Businesses</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <!-- Value Prop 1 -->
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-[#347e44]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#16642e] text-3xl">public</span>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold text-[#1d1c16] mb-2">Nationwide Access</h4>
+            <p class="text-[#40493f] text-sm leading-relaxed">Connect with buyers and sellers across all regions of Malawi, bridging the urban-rural divide.</p>
+          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">2,400+</div>
-          <div class="stat-label">Live Listings</div>
+        <!-- Value Prop 2 -->
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-[#347e44]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#16642e] text-3xl">verified_user</span>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold text-[#1d1c16] mb-2">Verified Users</h4>
+            <p class="text-[#40493f] text-sm leading-relaxed">Every participant is vetted through a rigorous KYC process ensuring a community of trust.</p>
+          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">1,700+</div>
-          <div class="stat-label">Products Available</div>
+        <!-- Value Prop 3 -->
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-[#347e44]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#16642e] text-3xl">payments</span>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold text-[#1d1c16] mb-2">Secure Payments</h4>
+            <p class="text-[#40493f] text-sm leading-relaxed">Integrated escrow services protect your money until the goods are delivered and verified.</p>
+          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Secure Transactions</div>
+        <!-- Value Prop 4 -->
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-[#347e44]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#16642e] text-3xl">monitoring</span>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold text-[#1d1c16] mb-2">Market Trends</h4>
+            <p class="text-[#40493f] text-sm leading-relaxed">Real-time price monitoring and demand insights to help you trade smarter.</p>
+          </div>
+        </div>
+        <!-- Value Prop 5 -->
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-[#347e44]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#16642e] text-3xl">smartphone</span>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold text-[#1d1c16] mb-2">Mobile-Friendly</h4>
+            <p class="text-[#40493f] text-sm leading-relaxed">Optimized for every device, including basic USSD access for remote locations.</p>
+          </div>
+        </div>
+        <!-- Value Prop 6 -->
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-[#347e44]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#16642e] text-3xl">account_balance_wallet</span>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold text-[#1d1c16] mb-2">Flexible Payments</h4>
+            <p class="text-[#40493f] text-sm leading-relaxed">Supports Airtel Money, TNM Mpamba, and all major Malawian bank transfers.</p>
+          </div>
         </div>
       </div>
     </div>

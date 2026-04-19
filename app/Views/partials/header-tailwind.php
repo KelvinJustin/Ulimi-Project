@@ -143,7 +143,7 @@ function isNavLinkActive($href, $currentPath) {
               <?php endif; ?>
               <a href="<?= $base ?>/marketplace-site" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Marketplace</a>
               <a href="<?= $base ?>/services" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Services</a>
-              <a href="<?= $base ?>/about" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">About Ulimi</a>
+              <a href="<?= $base ?>/about" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">About Us</a>
               <a href="<?= $base ?>/support" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Support</a>
             </div>
             <div class="py-6">
@@ -154,9 +154,11 @@ function isNavLinkActive($href, $currentPath) {
                 </div>
                 <a href="<?= $base ?>/dashboard" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Dashboard</a>
                 <?php if ($user['role'] === 'seller'): ?>
-                <div class="relative">
-                  <a href="<?= $base ?>/messages" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Messages</a>
-                  <span id="mobileMessageBadge" class="hidden absolute -top-1 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">0</span>
+                <div class="relative -mx-3">
+                  <a href="<?= $base ?>/messages" class="flex items-center rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">
+                    <span>Messages</span>
+                    <span id="mobileMessageBadge" class="hidden ml-4 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">0</span>
+                  </a>
                 </div>
                 <?php endif; ?>
                 <a href="<?= $base ?>/profile" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-dark-fern hover:bg-soft-linen">Profile Settings</a>

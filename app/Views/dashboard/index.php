@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($title ?? 'Dashboard', ENT_QUOTES, 'UTF-8') ?></title>
+  <link rel="icon" type="image/png" href="/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -1669,6 +1670,7 @@
               <option value="active">Active</option>
               <option value="pending">Pending</option>
               <option value="sold">Sold</option>
+              <option value="archived">Archived</option>
             </select>
           </div>
           <div class="filter-group">
@@ -1678,11 +1680,16 @@
               <option value="cereals">Cereals</option>
               <option value="vegetables">Vegetables</option>
               <option value="legumes">Legumes</option>
+              <option value="fruits">Fruits</option>
+              <option value="tubers">Tubers</option>
             </select>
           </div>
         </div>
 
-        <table class="data-table">
+        <div id="listings-loading" style="text-align: center; padding: 2rem; color: var(--dashboard-subtle);">Loading listings...</div>
+        <div id="listings-empty" style="display: none; text-align: center; padding: 2rem; color: var(--dashboard-subtle);">No listings found</div>
+
+        <table class="data-table" id="listings-table" style="display: none;">
           <thead>
             <tr>
               <th>Product</th>
@@ -1694,52 +1701,7 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Test Maize Listing</td>
-              <td>Test Seller</td>
-              <td>MWK 50.00/kg</td>
-              <td>100 kg</td>
-              <td><span class="status-badge active">Active</span></td>
-              <td>2026-04-09</td>
-              <td>
-                <div class="action-buttons">
-                  <button class="action-btn">View</button>
-                  <button class="action-btn">Edit</button>
-                  <button class="action-btn danger">Delete</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>miludliufh</td>
-              <td>Test Seller</td>
-              <td>MWK 10.00/kg</td>
-              <td>1000 kg</td>
-              <td><span class="status-badge active">Active</span></td>
-              <td>2026-04-09</td>
-              <td>
-                <div class="action-buttons">
-                  <button class="action-btn">View</button>
-                  <button class="action-btn">Edit</button>
-                  <button class="action-btn danger">Delete</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>werwerw</td>
-              <td>Test Seller</td>
-              <td>MWK 23,235.00/kg</td>
-              <td>325,235 kg</td>
-              <td><span class="status-badge active">Active</span></td>
-              <td>2026-04-09</td>
-              <td>
-                <div class="action-buttons">
-                  <button class="action-btn">View</button>
-                  <button class="action-btn">Edit</button>
-                  <button class="action-btn danger">Delete</button>
-                </div>
-              </td>
-            </tr>
+          <tbody id="listings-tbody">
           </tbody>
         </table>
       </section>
@@ -2069,6 +2031,114 @@
 
   <script>
     const base = '<?= $base ?>';
+
+    // Load listings functionality
+    function loadListings() {
+      const status = document.getElementById('listing-status').value;
+      const category = document.getElementById('listing-category').value;
+
+      const url = new URL(base + '/admin/all-listings', window.location.origin);
+      if (status) url.searchParams.set('status', status);
+      if (category) url.searchParams.set('category', category);
+
+      fetch(url.toString())
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('listings-loading').style.display = 'none';
+
+          if (data.success && data.listings.length > 0) {
+            document.getElementById('listings-table').style.display = 'table';
+            document.getElementById('listings-empty').style.display = 'none';
+            renderListings(data.listings);
+          } else {
+            document.getElementById('listings-table').style.display = 'none';
+            document.getElementById('listings-empty').style.display = 'block';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading listings:', error);
+          document.getElementById('listings-loading').innerHTML = 'Error loading listings';
+        });
+    }
+
+    function renderListings(listings) {
+      const tbody = document.getElementById('listings-tbody');
+      tbody.innerHTML = listings.map(l => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(l.title)}</strong><br>
+            <small>${escapeHtml(l.commodity_name || 'N/A')}</small>
+          </td>
+          <td>${escapeHtml(l.seller_name || 'Unknown')}</td>
+          <td>MWK ${l.price_per_unit} / ${l.price_unit}</td>
+          <td>${l.quantity_available} ${l.price_unit}</td>
+          <td><span class="status-badge ${l.status}">${capitalizeFirst(l.status)}</span></td>
+          <td>${new Date(l.created_at).toLocaleDateString()}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="action-btn" onclick="viewListing(${l.id})">View</button>
+              <button class="action-btn" onclick="editListing(${l.id})">Edit</button>
+              <button class="action-btn danger" onclick="deleteListing(${l.id})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function capitalizeFirst(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function viewListing(id) {
+      window.location.href = base + '/listings/' + id;
+    }
+
+    function editListing(id) {
+      window.location.href = base + '/listings/edit/' + id;
+    }
+
+    function deleteListing(id) {
+      if (!confirm('Are you sure you want to delete this listing? This action cannot be undone.')) return;
+
+      const formData = new FormData();
+      formData.append('listing_id', id);
+      formData.append('_csrf', document.querySelector('[name=_csrf]')?.value);
+
+      fetch(base + '/listings/delete', {
+        method: 'POST',
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          alert('Listing deleted successfully');
+          loadListings();
+        } else {
+          alert('Failed to delete listing: ' + (data.message || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to delete listing. Please try again.');
+      });
+    }
+
+    // Initialize listings on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadListings();
+
+      // Add filter event listeners
+      document.getElementById('listing-status').addEventListener('change', loadListings);
+      document.getElementById('listing-category').addEventListener('change', loadListings);
+    });
 
     // View user functionality
     function viewUser(userId, displayName, email, role, event) {

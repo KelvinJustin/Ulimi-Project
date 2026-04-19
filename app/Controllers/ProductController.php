@@ -971,6 +971,61 @@ final class ProductController
         }
     }
 
+    public function getAllListings(): void
+    {
+        header('Content-Type: application/json');
+
+        // Require admin role
+        Auth::requireAdmin();
+
+        try {
+            $listing = new Listing();
+            $pdo = $listing->db;
+
+            // Get filter parameters
+            $status = $_GET['status'] ?? '';
+            $category = $_GET['category'] ?? '';
+
+            // Build query with filters
+            $sql = "
+                SELECT cl.*, c.name as commodity_name, up.display_name as seller_name
+                FROM commodity_listings cl
+                LEFT JOIN commodities c ON cl.commodity_id = c.id
+                LEFT JOIN users u ON cl.seller_id = u.id
+                LEFT JOIN user_profiles up ON u.id = up.user_id
+                WHERE 1=1
+            ";
+
+            $params = [];
+
+            if (!empty($status)) {
+                $sql .= " AND cl.status = :status";
+                $params[':status'] = $status;
+            }
+
+            if (!empty($category)) {
+                $sql .= " AND c.name = :category";
+                $params[':category'] = $category;
+            }
+
+            $sql .= " ORDER BY cl.created_at DESC";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $listings = $stmt->fetchAll();
+
+            echo json_encode([
+                'success' => true,
+                'listings' => $listings,
+                'count' => count($listings)
+            ]);
+        } catch (Exception $e) {
+            error_log('Error fetching all listings: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to fetch listings']);
+        }
+    }
+
     public function autoArchiveOldListings(): void
     {
         // This method can be called via cron job or manually to auto-archive listings older than 4 months

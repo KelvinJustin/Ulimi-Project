@@ -5,458 +5,227 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($title ?? 'About Ulimi', ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/app.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/assets/css/output.css">
   <link rel="icon" type="image/png" href="<?= rtrim((string)\App\Core\Config::get('app.base_url', ''), '/') ?>/logo.png">
   <style>
-    /* About page scoped styles */
-    .about-page {
-      --about-bg: #f2ede4;
-      --about-card-bg: rgba(255,255,255,0.92);
-      --about-border: rgba(171,175,159,0.2);
-      --about-text: #1a3d22;
-      --about-accent: #347e44;
-      --about-subtle: #abaf9f;
-      background: var(--about-bg);
-      color: var(--about-text);
-      font-family: 'DM Sans', sans-serif;
-      line-height: 1.6;
+    body { font-family: 'Manrope', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
-
-    .about-section {
-      padding: 80px 0;
+    .atmospheric-shadow {
+      box-shadow: 0px 12px 32px rgba(26, 61, 34, 0.06);
     }
-
-    .about-container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .about-hero {
-      text-align: center;
-      padding: 120px 0 80px;
-      background: linear-gradient(135deg, rgba(61,107,63,0.08) 0%, rgba(200,168,75,0.07) 100%);
-    }
-
-    .about-hero h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 3.5rem;
-      font-weight: 400;
-      margin-bottom: 1.5rem;
-      color: var(--about-text);
-    }
-
-    .about-hero p {
-      font-size: 1.25rem;
-      margin-bottom: 2.5rem;
-      color: var(--about-subtle);
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-btn {
-      display: inline-block;
-      padding: 14px 32px;
-      background: var(--about-accent);
-      color: white;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 500;
-      transition: all 0.3s;
-      border: 2px solid var(--about-accent);
-    }
-
-    .cta-btn:hover {
-      background: transparent;
-      color: var(--about-accent);
-    }
-
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2.5rem;
-      text-align: center;
-      margin-bottom: 3rem;
-      color: var(--about-text);
-    }
-
-    .mission,
-    .vision,
-    .approach {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .mission h2,
-    .vision h2,
-    .approach h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      color: var(--about-text);
-    }
-
-    .mission p,
-    .vision p,
-    .approach p {
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-      color: var(--about-subtle);
-    }
-
-    .values {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      margin-bottom: 4rem;
-    }
-
-    .value {
-      background: var(--about-card-bg);
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 8px 32px rgba(43,42,37,0.06);
-      border: 1px solid var(--about-border);
-      text-align: center;
-    }
-
-    .value h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: var(--about-accent);
-    }
-
-    .value p {
-      color: var(--about-subtle);
-      line-height: 1.6;
-    }
-
-    .stats {
-      background: linear-gradient(135deg, rgba(61,107,63,0.05) 0%, rgba(200,168,75,0.04) 100%);
-      padding: 4rem 0;
-      margin-bottom: 4rem;
-    }
-
-    .stats .about-container {
-      text-align: center;
-    }
-
-    .stats h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2.5rem;
-      margin-bottom: 3rem;
-      color: var(--about-text);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-    }
-
-    .stat {
-      text-align: center;
-    }
-
-    .stat h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 3rem;
-      font-weight: 400;
-      margin-bottom: 0.5rem;
-      color: var(--about-accent);
-    }
-
-    .stat p {
-      font-size: 1.1rem;
-      color: var(--about-subtle);
-    }
-
-    .approach ul {
-      text-align: left;
-      list-style: none;
-      padding: 0;
-      margin: 2rem 0;
-    }
-
-    .approach li {
-      padding: 0.75rem 0;
-      padding-left: 2rem;
-      position: relative;
-      color: var(--about-subtle);
-    }
-
-    .approach li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--about-accent);
-      font-weight: bold;
-    }
-
-    .team {
-      text-align: center;
-    }
-
-    .team p {
-      max-width: 600px;
-      margin: 0 auto 3rem;
-      color: var(--about-subtle);
-    }
-
-    .team-members {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .team-member {
-      background: var(--about-card-bg);
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 8px 32px rgba(43,42,37,0.06);
-      border: 1px solid var(--about-border);
-      text-align: center;
-    }
-
-    .team-member img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 1.5rem;
-      border: 4px solid var(--about-accent);
-    }
-
-    .team-member h4 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.25rem;
-      margin-bottom: 0.5rem;
-      color: var(--about-text);
-    }
-
-    .team-member p {
-      color: var(--about-subtle);
-      margin: 0;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .about-hero h1 {
-        font-size: 2.5rem;
-      }
-
-      .about-hero p {
-        font-size: 1.1rem;
-      }
-
-      .values {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .team-members {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Critical Breakpoint - Fix 531px/607px width issue */
-    @media (max-width: 540px) {
-      .about-hero {
-        padding: 2.75rem 0.875rem;
-      }
-      
-      .about-hero h1 {
-        font-size: 1.875rem;
-      }
-      
-      .about-hero p {
-        font-size: 0.95rem;
-      }
-      
-      .stats-grid {
-        gap: 0.875rem;
-      }
-      
-      .stat-card {
-        padding: 1.25rem;
-      }
-    }
-
-    /* Mobile phones - Small (Fixes 640px/607px issues) */
-    @media (max-width: 640px) {
-      .about-hero {
-        padding: 3rem 1rem;
-      }
-      
-      .about-hero h1 {
-        font-size: 2rem;
-      }
-      
-      .about-hero p {
-        font-size: 1rem;
-      }
-      
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      
-      .stat-card {
-        padding: 1.5rem;
-      }
-    }
-
-    /* Mobile phones - Extra small */
-    @media (max-width: 480px) {
-      .about-hero {
-        padding: 2rem 0.75rem;
-      }
-      
-      .about-hero h1 {
-        font-size: 1.75rem;
-      }
-      
-      .about-hero p {
-        font-size: 0.95rem;
-      }
-    }
-
-    /* Ultra small screens */
-    @media (max-width: 360px) {
-      .about-hero h1 {
-        font-size: 1.5rem;
-      }
+    .primary-gradient {
+      background: linear-gradient(135deg, #16642e 0%, #347e44 100%);
     }
   </style>
 </head>
-<body class="about-page">
-  <?php require APP_PATH . '/Views/partials/header-tailwind.php'; ?>
-  <?php $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/'); ?>
+<body class="bg-[#fef9f0] text-[#1d1c16]">
 
-  <!-- Hero Section -->
-  <section class="about-hero">
-    <div class="about-container">
-      <h1>About Ulimi</h1>
-      <p>Ulimi is transforming the agricultural supply chain, connecting farmers, buyers, and suppliers across Malawi with a seamless, AI-powered platform. Our mission is to make agricultural trade faster, safer, and more accessible to everyone.</p>
-      <a href="<?= $base ?>/register" class="cta-btn">Get Started</a>
-    </div>
-  </section>
+<?php require APP_PATH . '/Views/partials/header-tailwind.php'; ?>
+<?php $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/'); ?>
 
-  <!-- Mission Section -->
-  <section class="about-section mission">
-    <div class="about-container">
-      <h2>Our Mission</h2>
-      <p>At Ulimi, we believe that the future of agriculture lies in accessible, transparent, and efficient trade. Our goal is to provide farmers and agribusinesses with the tools they need to expand their reach, secure better deals, and overcome barriers to market access.</p>
-      <p>We bridge the gap between local producers and markets across Malawi, empowering them to trade on their own terms, at competitive prices, with complete deal protection.</p>
-    </div>
-  </section>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-8 pb-8 grid md:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<h1 class="text-6xl md:text-7xl font-bold text-[#1d1c16] leading-[1.1] tracking-tight">About Ulimi</h1>
+<p class="text-lg text-[#40493f] leading-relaxed max-w-xl">
+  We are transforming the agricultural supply chain in Malawi through a decentralized digital conservatory. By bridging the gap between local growers and global buyers, we nurture a ecosystem where every harvest finds its true value.
+</p>
+<div class="flex gap-4">
+<a href="<?= $base ?>/register" class="primary-gradient text-white px-8 py-4 rounded-full font-bold text-lg atmospheric-shadow hover:opacity-90 transition-opacity">Get Started</a>
+<button class="bg-[#e7e2d9] text-[#1d1c16] px-8 py-4 rounded-full font-bold text-lg hover:bg-[#ece8df] transition-colors">Our Network</button>
+</div>
+</div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-[#347e44]/10 rounded-[2.5rem] blur-2xl group-hover:bg-[#347e44]/20 transition-all"></div>
+<img class="relative w-[80%] h-[350px] object-cover rounded-[2rem] atmospheric-shadow" alt="aerial view of crowded cattle market next to field" src="https://images.pexels.com/photos/33786829/pexels-photo-33786829/free-photo-of-aerial-view-of-crowded-cattle-market-next-to-field.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+</div>
+</section>
 
-  <!-- Vision Section -->
-  <section class="about-section vision">
-    <div class="about-container">
-      <h2>Our Vision</h2>
-      <p>We envision a Malawi where every farmer, no matter the size of their operation, can easily connect with buyers, suppliers, and markets. Ulimi strives to be the leading agri-tech solution in Malawi, providing real-time market intelligence, secure transactions, and access to funding.</p>
-      <p>Our platform uses cutting-edge technology to break down language barriers, track commodity prices, and offer financing solutions to make agricultural trade a reality for every player in Malawi.</p>
-    </div>
-  </section>
+<!-- Mission & Vision -->
+<section class="bg-[#f8f3ea] py-24">
+<div class="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-8">
+<div class="bg-white p-12 rounded-[1.5rem] atmospheric-shadow flex flex-col justify-between">
+<div>
+<span class="text-[#16642e] font-bold tracking-[0.2em] text-[0.65rem] uppercase mb-4 block">Purpose</span>
+<h2 class="text-3xl font-semibold mb-6">Our Mission</h2>
+<p class="text-[#40493f] text-lg leading-relaxed">
+  To build an accessible, transparent, and efficient trade network that empowers Malawian farmers. We dismantle the barriers of traditional logistics to ensure that the fruits of labor reach the market with integrity and speed.
+</p>
+</div>
+<div class="mt-8">
+<span class="material-symbols-outlined text-[#347e44] text-5xl">diversity_2</span>
+</div>
+</div>
+<div class="bg-[#347e44] p-12 rounded-[1.5rem] atmospheric-shadow text-[#d7ffd6] flex flex-col justify-between">
+<div>
+<span class="text-white/70 font-bold tracking-[0.2em] text-[0.65rem] uppercase mb-4 block">The Future</span>
+<h2 class="text-3xl font-semibold mb-6">Our Vision</h2>
+<p class="text-white/90 text-lg leading-relaxed">
+  To become the leading agri-tech solution in Malawi, setting the gold standard for digital commerce in Africa. We envision a future where technology and tradition harmonize to create sustainable wealth for every agricultural community.
+</p>
+</div>
+<div class="mt-8">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">visibility</span>
+</div>
+</div>
+</div>
+</section>
 
-  <!-- Core Values Section -->
-  <section class="about-section">
-    <div class="about-container">
-      <h2 class="section-title">Our Core Values</h2>
-      <div class="values">
-        <div class="value">
-          <h3>Integrity</h3>
-          <p>We are committed to maintaining transparency, honesty, and fairness in every interaction, ensuring that every transaction is secure and reliable.</p>
-        </div>
-        <div class="value">
-          <h3>Innovation</h3>
-          <p>We continually push the boundaries of technology to offer smarter, more efficient tools for farmers, suppliers, and buyers in the agriculture sector.</p>
-        </div>
-        <div class="value">
-          <h3>Sustainability</h3>
-          <p>We aim to support practices that ensure long-term environmental, economic, and social sustainability in the agricultural industry.</p>
-        </div>
-        <div class="value">
-          <h3>Empowerment</h3>
-          <p>We empower our users by giving them the tools, insights, and opportunities they need to grow their businesses, expand their markets, and improve their livelihoods.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Core Values -->
+<section class="max-w-7xl mx-auto px-8 py-24">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-4">Our Core Values</h2>
+<div class="h-1 w-20 bg-[#beab5e] mx-auto rounded-full"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="p-8 bg-[#f8f3ea] rounded-[1.5rem] text-center hover:bg-[#ece8df] transition-colors">
+<span class="material-symbols-outlined text-[#16642e] text-4xl mb-6">verified_user</span>
+<h3 class="text-xl font-bold mb-3">Integrity</h3>
+<p class="text-sm text-[#40493f]">Radical transparency in every transaction and partnership we form.</p>
+</div>
+<div class="p-8 bg-[#f8f3ea] rounded-[1.5rem] text-center hover:bg-[#ece8df] transition-colors">
+<span class="material-symbols-outlined text-[#16642e] text-4xl mb-6">lightbulb</span>
+<h3 class="text-xl font-bold mb-3">Innovation</h3>
+<p class="text-sm text-[#40493f]">Pioneering digital solutions tailored for the unique Malawian landscape.</p>
+</div>
+<div class="p-8 bg-[#f8f3ea] rounded-[1.5rem] text-center hover:bg-[#ece8df] transition-colors">
+<span class="material-symbols-outlined text-[#16642e] text-4xl mb-6">eco</span>
+<h3 class="text-xl font-bold mb-3">Sustainability</h3>
+<p class="text-sm text-[#40493f]">Fostering growth that respects the land and future generations.</p>
+</div>
+<div class="p-8 bg-[#f8f3ea] rounded-[1.5rem] text-center hover:bg-[#ece8df] transition-colors">
+<span class="material-symbols-outlined text-[#16642e] text-4xl mb-6">handshake</span>
+<h3 class="text-xl font-bold mb-3">Empowerment</h3>
+<p class="text-sm text-[#40493f]">Providing the tools for farmers to take control of their economic destiny.</p>
+</div>
+</div>
+</section>
 
-  <!-- Stats Section -->
-  <section class="stats">
-    <div class="about-container">
-      <h2>Ulimi by the Numbers</h2>
-      <div class="stats-grid">
-        <div class="stat">
-          <h3>8,800+</h3>
-          <p>Companies Registered</p>
-        </div>
-        <div class="stat">
-          <h3>130+</h3>
-          <p>Countries Served</p>
-        </div>
-        <div class="stat">
-          <h3>100%</h3>
-          <p>Deal Protection</p>
-        </div>
-        <div class="stat">
-          <h3>2,400+</h3>
-          <p>Active Listings Today</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Approach -->
+<section class="max-w-7xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-20 items-center">
+<div class="order-2 md:order-1 relative">
+<div class="absolute -top-10 -left-10 w-40 h-40 bg-[#fdd97b] rounded-full opacity-20 blur-3xl"></div>
+<img class="relative rounded-[2rem] atmospheric-shadow" alt="smartphone in field" src="https://images.pexels.com/photos/36470055/pexels-photo-36470055/free-photo-of-selection-of-products-in-shop.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+</div>
+<div class="order-1 md:order-2 space-y-8">
+<span class="bg-[#fdd97b] text-[#785d06] px-4 py-1.5 rounded-full text-[0.65rem] font-bold uppercase tracking-widest">Our Approach</span>
+<h2 class="text-4xl font-bold leading-tight">Revolutionizing Trade Through Direct Connections</h2>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="w-12 h-12 shrink-0 bg-[#e7e2d9] rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e]">bolt</span>
+</div>
+<div>
+<h4 class="font-bold">Faster Exchange</h4>
+<p class="text-[#40493f] text-sm">Real-time matching algorithms reduce time-to-market by 40%.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-12 h-12 shrink-0 bg-[#e7e2d9] rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e]">shield</span>
+</div>
+<div>
+<h4 class="font-bold">Safer Transactions</h4>
+<p class="text-[#40493f] text-sm">End-to-end encryption and verified seller profiles ensure peace of mind.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-12 h-12 shrink-0 bg-[#e7e2d9] rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e]">public</span>
+</div>
+<div>
+<h4 class="font-bold">Total Accessibility</h4>
+<p class="text-[#40493f] text-sm">Optimized for low-bandwidth environments to reach remote districts.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-  <!-- Approach Section -->
-  <section class="about-section approach">
-    <div class="about-container">
-      <h2>Our Approach to Malawi Agricultural Trade</h2>
-      <p>Ulimi is revolutionizing agricultural trade by making it faster, safer, and more accessible. Our platform connects farmers with buyers, suppliers, and investors in real-time, removing the barriers to entry that often exist in traditional markets. We empower agricultural businesses by:</p>
-      <ul>
-        <li>Providing access to a marketplace for agricultural goods across Malawi</li>
-        <li>Offering real-time price tracking, market insights, and AI-powered predictions</li>
-        <li>Ensuring risk-free transactions with 100% deal protection</li>
-        <li>Enabling users to access financing and payment solutions designed specifically for the agri-business sector</li>
-      </ul>
-    </div>
-  </section>
+<!-- Meet the Team -->
+<section class="max-w-7xl mx-auto px-8 py-24 mb-20">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-4">Meet the Visionaries</h2>
+<p class="text-[#40493f]">The minds behind the agricultural revolution in Malawi.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Team Card 1 -->
+<div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
+<div class="relative w-40 h-40 mx-auto mb-6">
+<div class="absolute inset-0 bg-[#347e44] rounded-full scale-105 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+<img class="w-full h-full object-cover rounded-full border-4 border-[#fef9f0] shadow-inner" alt="John Doe" src="https://images.pexels.com/photos/2182970/pexels-photo-2182970/free-photo-of-man-in-white-shirt.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1">
+</div>
+<h3 class="text-xl font-bold">John Doe</h3>
+<p class="text-[#16642e] font-semibold text-sm mb-4">Co-Founder & CEO</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-4">An agricultural logistics veteran with a decade of experience in African trade routes.</p>
+</div>
+<!-- Team Card 2 -->
+<div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
+<div class="relative w-40 h-40 mx-auto mb-6">
+<div class="absolute inset-0 bg-[#347e44] rounded-full scale-105 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+<img class="w-full h-full object-cover rounded-full border-4 border-[#fef9f0] shadow-inner" alt="Jane Smith" src="https://images.pexels.com/photos/3764119/pexels-photo-3764119/free-photo-of-woman-with-glasses.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1">
+</div>
+<h3 class="text-xl font-bold">Jane Smith</h3>
+<p class="text-[#16642e] font-semibold text-sm mb-4">CTO</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-4">Expert in decentralized networks and supply chain digitization for emerging markets.</p>
+</div>
+<!-- Team Card 3 -->
+<div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
+<div class="relative w-40 h-40 mx-auto mb-6">
+<div class="absolute inset-0 bg-[#347e44] rounded-full scale-105 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+<img class="w-full h-full object-cover rounded-full border-4 border-[#fef9f0] shadow-inner" alt="Michael Johnson" src="https://images.pexels.com/photos/2379005/pexels-photo-2379005/free-photo-of-man-wearing-white-shirt.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1">
+</div>
+<h3 class="text-xl font-bold">Michael Johnson</h3>
+<p class="text-[#16642e] font-semibold text-sm mb-4">COO</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-4">Streamlining operations and ensuring every connection on Ulimi translates to real impact.</p>
+</div>
+</div>
+</section>
+</main>
 
-  <!-- Team Section -->
-  <section class="about-section team">
-    <div class="about-container">
-      <h2 class="section-title">Meet the Team</h2>
-      <p>Behind Ulimi is a diverse team of experts with a passion for agriculture and technology. Our team is dedicated to building innovative solutions that support farmers and agribusinesses across Malawi.</p>
-      <div class="team-members">
-        <div class="team-member">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e8f5e9'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-family='Arial' font-size='40' fill='%233d6b3f'%3EJD%3C/text%3E%3C/svg%3E" alt="John Doe">
-          <h4>John Doe</h4>
-          <p>Co-Founder & CEO</p>
-        </div>
-        <div class="team-member">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e8f5e9'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-family='Arial' font-size='40' fill='%233d6b3f'%3EJS%3C/text%3E%3C/svg%3E" alt="Jane Smith">
-          <h4>Jane Smith</h4>
-          <p>Chief Technology Officer</p>
-        </div>
-        <div class="team-member">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e8f5e9'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-family='Arial' font-size='40' fill='%233d6b3f'%3EMJ%3C/text%3E%3C/svg%3E" alt="Michael Johnson">
-          <h4>Michael Johnson</h4>
-          <p>Chief Operations Officer</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
 
-  <?php require APP_PATH . '/Views/partials/footer-tailwind.php'; ?>
+    function animateCounter(counter) {
+      const target = +counter.getAttribute('data-target');
+      const suffix = counter.getAttribute('data-suffix') || '';
+      const addPlus = !suffix && counter.textContent.includes('+');
+      const duration = 2000; // 2 seconds
+      const increment = target / (duration / 16); // 60fps
+      let current = 0;
+
+      const updateCounter = () => {
+        current += increment;
+        if (current < target) {
+          const displayValue = Math.ceil(current);
+          counter.textContent = displayValue.toLocaleString() + suffix + (addPlus && displayValue >= target ? '+' : '');
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.textContent = target.toLocaleString() + suffix + (addPlus ? '+' : '');
+        }
+      };
+
+      updateCounter();
+    }
+
+    // Start counter animation when page loads
+    setTimeout(() => {
+      counters.forEach((counter, index) => {
+        setTimeout(() => {
+          animateCounter(counter);
+        }, index * 200); // Stagger animations
+      });
+    }, 500);
+  });
+</script>
+
+<?php require APP_PATH . '/Views/partials/footer-tailwind.php'; ?>
 </body>
 </html>

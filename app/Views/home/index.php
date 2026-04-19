@@ -231,17 +231,17 @@
       <div class="inline-block text-xs font-medium uppercase tracking-[1.5px] text-leaf mb-3.5 scroll-animate">How it works</div>
       <h2 class="font-head text-[clamp(32px,4vw,48px)] leading-[1.15] tracking-[-1px] text-charcoal mb-16 scroll-animate">Buy and sell at the<br>best possible price</h2>
       <div class="flex flex-wrap gap-6">
-        <div class="bg-white rounded-2xl border border-earth/12 p-8 shadow-lg transition-all duration-280 ease-custom hover:-translate-y-1 hover:shadow-xl flex-1 min-w-[280px] scroll-animate">
+        <div class="bg-cream rounded-2xl border border-earth/12 p-8 shadow-lg transition-all duration-280 ease-custom hover:-translate-y-1 hover:shadow-xl flex-1 min-w-[280px] scroll-animate">
           <div class="font-head text-[48px] text-crop leading-none mb-5">01</div>
           <div class="text-lg font-medium text-charcoal mb-3">Register your farm or business</div>
           <div class="text-sm leading-[1.7] text-text-muted">Create your profile for free in minutes. No commitments, no technical skills required. Anyone can trade on Ulimi regardless of business scale.</div>
         </div>
-        <div class="bg-white rounded-2xl border border-earth/12 p-8 shadow-lg transition-all duration-280 ease-custom hover:-translate-y-1 hover:shadow-xl flex-1 min-w-[280px] scroll-animate" style="transition-delay: 0.1s;">
+        <div class="bg-cream rounded-2xl border border-earth/12 p-8 shadow-lg transition-all duration-280 ease-custom hover:-translate-y-1 hover:shadow-xl flex-1 min-w-[280px] scroll-animate" style="transition-delay: 0.1s;">
           <div class="font-head text-[48px] text-crop leading-none mb-5">02</div>
           <div class="text-lg font-medium text-charcoal mb-3">Connect with buyers &amp; sellers</div>
           <div class="text-sm leading-[1.7] text-text-muted">Browse Malawi's agricultural marketplace. Filter by commodity, region, and distance. Receive real-time offers and compare them side-by-side.</div>
         </div>
-        <div class="bg-white rounded-2xl border border-earth/12 p-8 shadow-lg transition-all duration-280 ease-custom hover:-translate-y-1 hover:shadow-xl flex-1 min-w-[280px] scroll-animate" style="transition-delay: 0.2s;">
+        <div class="bg-cream rounded-2xl border border-earth/12 p-8 shadow-lg transition-all duration-280 ease-custom hover:-translate-y-1 hover:shadow-xl flex-1 min-w-[280px] scroll-animate" style="transition-delay: 0.2s;">
           <div class="font-head text-[48px] text-crop leading-none mb-5">03</div>
           <div class="text-lg font-medium text-charcoal mb-3">Close deals with confidence</div>
           <div class="text-sm leading-[1.7] text-text-muted">Negotiate over phone or through digital listings. Protect 100% of your transaction — money and goods — with zero bureaucracy.</div>
