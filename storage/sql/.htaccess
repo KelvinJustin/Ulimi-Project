@@ -1,0 +1,11 @@
+# Deny all web access to this directory
+<FilesMatch "\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Deny access to SQL files
+<FilesMatch "\.sql$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

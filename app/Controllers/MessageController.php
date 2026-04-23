@@ -24,6 +24,8 @@ final class MessageController
         $sellerId = (int)($request->input('seller_id') ?? 0);
         $listingId = (int)($request->input('listing_id') ?? 0);
 
+        error_log("createConversation: Authenticated user_id={$user['id']}, email={$user['email']}, requested seller_id={$sellerId}, listing_id={$listingId}");
+
         if ($sellerId <= 0) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid seller ID']);
@@ -260,14 +262,25 @@ final class MessageController
 
         $file = $_FILES['image'];
         $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
         $maxSize = 5 * 1024 * 1024; // 5MB
 
+        // Validate MIME type
         if (!in_array($file['type'], $allowedTypes)) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPG, PNG, GIF allowed.']);
             return;
         }
 
+        // Validate file extension
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($extension, $allowedExtensions)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid file extension. Only JPG, PNG, GIF allowed.']);
+            return;
+        }
+
+        // Validate file size
         if ($file['size'] > $maxSize) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'File too large. Maximum 5MB.']);
@@ -281,7 +294,6 @@ final class MessageController
         }
 
         // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = uniqid('msg_', true) . '.' . $extension;
         $targetPath = $uploadDir . '/' . $filename;
 

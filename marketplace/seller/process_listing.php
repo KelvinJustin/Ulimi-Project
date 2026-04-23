@@ -38,12 +38,32 @@ if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPL
     }
     
     $file = $_FILES['product_image'];
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = uniqid('product_', true) . '.' . $extension;
-    $targetPath = $uploadDir . '/' . $filename;
     
-    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        $imagePath = 'uploads/products/' . $filename;
+    // Validate file type
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    
+    if (!in_array($file['type'], $allowedTypes)) {
+        $errors['image'] = 'Invalid file type. Only JPG, PNG, GIF allowed.';
+    }
+    
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($extension, $allowedExtensions)) {
+        $errors['image'] = 'Invalid file extension. Only JPG, PNG, GIF allowed.';
+    }
+    
+    // Validate file size (5MB max)
+    if ($file['size'] > 5 * 1024 * 1024) {
+        $errors['image'] = 'File too large. Maximum 5MB.';
+    }
+    
+    if (empty($errors)) {
+        $filename = uniqid('product_', true) . '.' . $extension;
+        $targetPath = $uploadDir . '/' . $filename;
+        
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            $imagePath = 'uploads/products/' . $filename;
+        }
     }
 }
 

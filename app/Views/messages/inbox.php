@@ -305,16 +305,19 @@ $user = \App\Core\Auth::user();
         const response = await fetch(`<?= $base ?>/api/messages/${conversationId}`);
         const data = await response.json();
 
-        if (data.success && data.messages.length > lastMessageCount[conversationId]) {
-          const newMessages = data.messages.slice(lastMessageCount[conversationId]);
-          newMessages.forEach(message => renderMessage(message));
-          lastMessageCount[conversationId] = data.messages.length;
+        if (data.success) {
+          const currentCount = lastMessageCount[conversationId] || 0;
+          if (data.messages.length > currentCount) {
+            const newMessages = data.messages.slice(currentCount);
+            newMessages.forEach(message => renderMessage(message));
+            lastMessageCount[conversationId] = data.messages.length;
 
-          // Scroll to bottom after a small delay to ensure DOM is updated
-          setTimeout(() => {
-            const container = document.getElementById('messagesContainer');
-            container.scrollTop = container.scrollHeight;
-          }, 100);
+            // Scroll to bottom after a small delay to ensure DOM is updated
+            setTimeout(() => {
+              const container = document.getElementById('messagesContainer');
+              container.scrollTop = container.scrollHeight;
+            }, 100);
+          }
         }
       } catch (error) {
         console.error('Error polling messages:', error);

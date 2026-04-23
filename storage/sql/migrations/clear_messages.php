@@ -1,9 +1,9 @@
 <?php
 // Clear all messages from the database
-$host = '127.0.0.1';
-$dbname = 'ulimi';
-$username = 'root';
-$password = '';
+$host = getenv('DB_HOST') ?: '127.0.0.1';
+$dbname = getenv('DB_NAME') ?: 'ulimi';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

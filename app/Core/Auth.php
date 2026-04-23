@@ -150,6 +150,10 @@ final class Auth
         http_response_code(302);
         if (!headers_sent()) {
             $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
+            // Ensure base_url is a relative path or same-origin to prevent open redirects
+            if (parse_url($base, PHP_URL_HOST) && parse_url($base, PHP_URL_HOST) !== parse_url($_SERVER['HTTP_HOST'] ?? '', PHP_URL_HOST)) {
+                $base = '';
+            }
             header('Location: ' . $base . '/login');
         }
         exit;

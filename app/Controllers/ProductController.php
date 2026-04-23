@@ -273,12 +273,21 @@ final class ProductController
     {
         // Validate file
         $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        $allowedExtensions = ['jpg', 'jpeg', 'png'];
         $maxSize = 5 * 1024 * 1024; // 5MB
 
+        // Validate MIME type
         if (!in_array($file['type'], $allowedTypes)) {
             return null;
         }
 
+        // Validate file extension
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($extension, $allowedExtensions)) {
+            return null;
+        }
+
+        // Validate file size
         if ($file['size'] > $maxSize) {
             return null;
         }
@@ -290,7 +299,6 @@ final class ProductController
         }
 
         // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = uniqid('product_', true) . '.' . $extension;
         $targetPath = $uploadDir . '/' . $filename;
 

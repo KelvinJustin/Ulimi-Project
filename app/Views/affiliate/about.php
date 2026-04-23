@@ -42,7 +42,7 @@
 </div>
 <div class="relative group">
 <div class="absolute -inset-4 bg-[#347e44]/10 rounded-[2.5rem] blur-2xl group-hover:bg-[#347e44]/20 transition-all"></div>
-<img class="relative w-[80%] h-[350px] object-cover rounded-[2rem] atmospheric-shadow" alt="aerial view of crowded cattle market next to field" src="https://images.pexels.com/photos/33786829/pexels-photo-33786829/free-photo-of-aerial-view-of-crowded-cattle-market-next-to-field.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
+<img class="relative w-[100%] h-[350px] object-cover rounded-[2rem] atmospheric-shadow" alt="aerial view of crowded cattle market next to field" src="https://images.pexels.com/photos/33786829/pexels-photo-33786829/free-photo-of-aerial-view-of-crowded-cattle-market-next-to-field.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1">
 </div>
 </section>
 

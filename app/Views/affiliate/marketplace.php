@@ -41,7 +41,7 @@
         </div>
       </div>
       <div class="flex-1 relative">
-        <div class="w-80% aspect-[1/5] rounded-[2.5rem] overflow-hidden atmospheric-shadow">
+        <div class="w-90% aspect-[2/5] rounded-[2.5rem] overflow-hidden atmospheric-shadow">
           <img src="https://images.pexels.com/photos/33364793/pexels-photo-33364793/free-photo-of-vibrant-local-market-with-fresh-vegetables.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&dpr=1" alt="Vibrant local market with fresh vegetables" class="w-full h-full object-cover">
         </div>
         <!-- Glassmorphism Stats Card -->

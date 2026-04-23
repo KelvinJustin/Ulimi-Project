@@ -1,9 +1,9 @@
 <?php
 // Simple database setup for marketplace
-$host = '127.0.0.1';
-$dbname = 'ulimi_marketplace';
-$username = 'root';
-$password = '';
+$host = getenv('DB_HOST') ?: '127.0.0.1';
+$dbname = getenv('MARKETPLACE_DB_NAME') ?: 'ulimi_marketplace';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);

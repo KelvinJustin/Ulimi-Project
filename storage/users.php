@@ -90,4 +90,13 @@ return array (
     'role' => 'buyer',
     'created_at' => '2026-04-19 10:49:35',
   ),
+  10 => 
+  array (
+    'id' => 29,
+    'email' => 'Zuze@gmail.com',
+    'password' => '$2y$10$eOkfM1/rOrKYTgdsXFiSkeR1Sto1ftzayzpQAA5uC1urc4TbHXoQa',
+    'display_name' => 'Zuze',
+    'role' => 'buyer',
+    'created_at' => '2026-04-21 11:21:05',
+  ),
 );

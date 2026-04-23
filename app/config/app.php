@@ -9,6 +9,8 @@ Config::set('app', [
     'env' => getenv('APP_ENV') ?: 'local',
 ]);
 
+$env = Config::get('app.env');
+
 Config::set('db', [
     'host' => getenv('DB_HOST') ?: '127.0.0.1',
     'name' => getenv('DB_NAME') ?: 'ulimi',
@@ -18,9 +20,9 @@ Config::set('db', [
 ]);
 
 Config::set('security', [
-    'csrf_key' => getenv('CSRF_KEY') ?: 'change-me',
-    'jwt_secret' => getenv('JWT_SECRET') ?: 'change-me',
-    'cookie_secure' => (getenv('COOKIE_SECURE') ?: '0') === '1',
+    'csrf_key' => getenv('CSRF_KEY') ?: ($env === 'production' ? throw new RuntimeException('CSRF_KEY must be set in environment for production') : 'dev-csrf-key'),
+    'jwt_secret' => getenv('JWT_SECRET') ?: ($env === 'production' ? throw new RuntimeException('JWT_SECRET must be set in environment for production') : 'dev-jwt-secret'),
+    'cookie_secure' => ($env === 'production') ? true : ((getenv('COOKIE_SECURE') ?: '0') === '1'),
 ]);
 
 Config::set('stripe', [

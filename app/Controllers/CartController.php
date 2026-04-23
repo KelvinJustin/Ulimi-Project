@@ -493,6 +493,7 @@ final class CartController
                 cl.title,
                 cl.price_per_unit,
                 cl.quantity_available,
+                cl.image_path,
                 com.name as commodity_name,
                 com.unit as commodity_unit,
                 up.display_name as seller_name
@@ -527,7 +528,8 @@ final class CartController
                     'price_per_unit_at_add' => $priceNumeric,
                     'commodity_name' => $listing['commodity_name'],
                     'commodity_unit' => $listing['commodity_unit'],
-                    'seller_name' => $listing['seller_name']
+                    'seller_name' => $listing['seller_name'],
+                    'image_path' => $listing['image_path']
                 ];
                 $subtotal += $cartItem['quantity'] * $priceNumeric;
             }
@@ -536,7 +538,7 @@ final class CartController
         // Calculate fees
         $platformFee = $subtotal * 0.05; // 5% platform fee
         $deliveryFee = 0; // TODO: Calculate based on location/weight
-        $tax = $subtotal * 0.175; // 17.5% tax
+        $tax = 0; // 0% tax
         $total = $subtotal + $platformFee + $deliveryFee + $tax;
 
         if (empty($cartItemsWithDetails)) {

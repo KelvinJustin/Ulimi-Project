@@ -9,7 +9,6 @@ use App\Controllers\HomeController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\BrowseController;
-use App\Controllers\PaymentController;
 use App\Controllers\AffiliateController;
 use App\Controllers\ProductController;
 use App\Controllers\ApiController;
@@ -25,12 +24,11 @@ final class WebRoutes
         $auth = new AuthController();
         $dashboard = new DashboardController();
         $browse = new BrowseController();
-                $payments = new PaymentController();
-        $affiliate = new AffiliateController();
         $product = new ProductController();
         $cart = new CartController();
         $message = new MessageController();
         $messages = new MessagesController();
+        $affiliate = new AffiliateController();
 
         $router->get('/', fn() => $home->index());
         $router->get('/browse', fn() => $browse->index());
@@ -117,14 +115,5 @@ final class WebRoutes
         // Checkout route
         $router->get('/checkout', fn() => $cart->checkout());
 
-        // PayChangu payment routes
-        $router->get('/payment/callback', fn(Request $req) => $payments->paymentCallback($req));
-        $router->get('/payment/return', fn(Request $req) => $payments->paymentReturn($req));
-
-        $router->get('/payments/stripe/{orderId}', fn(Request $req, array $params) => $payments->showStripeCheckout($req, $params));
-        $router->post('/payments/stripe/create', fn(Request $req) => $payments->createStripeCheckoutSession($req));
-        $router->get('/payments/stripe/success', fn(Request $req) => $payments->stripeSuccess($req));
-        $router->get('/payments/stripe/cancel', fn(Request $req) => $payments->stripeCancel($req));
-        $router->post('/webhooks/stripe', fn(Request $req) => $payments->stripeWebhook($req));
     }
 }
