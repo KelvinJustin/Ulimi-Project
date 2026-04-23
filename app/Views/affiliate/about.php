@@ -153,36 +153,51 @@
 <h2 class="text-4xl font-bold mb-4">Meet the Visionaries</h2>
 <p class="text-[#40493f]">The minds behind the agricultural revolution in Malawi.</p>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<!-- Team Card 1 -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+<!-- Team Card 1 - CEO -->
 <div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
-<div class="relative w-40 h-40 mx-auto mb-6">
-<div class="absolute inset-0 bg-[#347e44] rounded-full scale-105 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-<img class="w-full h-full object-cover rounded-full border-4 border-[#fef9f0] shadow-inner" alt="John Doe" src="https://images.pexels.com/photos/2182970/pexels-photo-2182970/free-photo-of-man-in-white-shirt.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1">
+<div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
-<h3 class="text-xl font-bold">John Doe</h3>
-<p class="text-[#16642e] font-semibold text-sm mb-4">Co-Founder & CEO</p>
-<p class="text-xs text-[#40493f] leading-relaxed px-4">An agricultural logistics veteran with a decade of experience in African trade routes.</p>
+<h3 class="text-lg font-bold">Owen Gerald</h3>
+<p class="text-[#16642e] font-semibold text-xs mb-3">CEO</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-2">An accountant with deep knowledge of sales and marketing, driving strategic growth and financial excellence.</p>
 </div>
-<!-- Team Card 2 -->
+<!-- Team Card 2 - Technical Head -->
 <div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
-<div class="relative w-40 h-40 mx-auto mb-6">
-<div class="absolute inset-0 bg-[#347e44] rounded-full scale-105 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-<img class="w-full h-full object-cover rounded-full border-4 border-[#fef9f0] shadow-inner" alt="Jane Smith" src="https://images.pexels.com/photos/3764119/pexels-photo-3764119/free-photo-of-woman-with-glasses.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1">
+<div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
-<h3 class="text-xl font-bold">Jane Smith</h3>
-<p class="text-[#16642e] font-semibold text-sm mb-4">CTO</p>
-<p class="text-xs text-[#40493f] leading-relaxed px-4">Expert in decentralized networks and supply chain digitization for emerging markets.</p>
+<h3 class="text-lg font-bold">Kelvin Nthinda</h3>
+<p class="text-[#16642e] font-semibold text-xs mb-3">Technical Expert Head</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-2">Technical expert leading the development of innovative solutions for the agricultural marketplace.</p>
 </div>
-<!-- Team Card 3 -->
+<!-- Team Card 3 - COO -->
 <div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
-<div class="relative w-40 h-40 mx-auto mb-6">
-<div class="absolute inset-0 bg-[#347e44] rounded-full scale-105 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-<img class="w-full h-full object-cover rounded-full border-4 border-[#fef9f0] shadow-inner" alt="Michael Johnson" src="https://images.pexels.com/photos/2379005/pexels-photo-2379005/free-photo-of-man-wearing-white-shirt.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1">
+<div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
-<h3 class="text-xl font-bold">Michael Johnson</h3>
-<p class="text-[#16642e] font-semibold text-sm mb-4">COO</p>
-<p class="text-xs text-[#40493f] leading-relaxed px-4">Streamlining operations and ensuring every connection on Ulimi translates to real impact.</p>
+<h3 class="text-lg font-bold">Zinyengo Nkandawire</h3>
+<p class="text-[#16642e] font-semibold text-xs mb-3">COO</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-2">Streamlining operations and ensuring every connection on Ulimi translates to real impact.</p>
+</div>
+<!-- Team Card 4 - Marketing Professional -->
+<div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
+<div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
+</div>
+<h3 class="text-lg font-bold">Mbayomo</h3>
+<p class="text-[#16642e] font-semibold text-xs mb-3">Marketing Professional</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-2">Marketing expert driving brand awareness and customer engagement across Malawi's agricultural sector.</p>
+</div>
+<!-- Team Card 5 - Accounting Professional -->
+<div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
+<div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
+</div>
+<h3 class="text-lg font-bold">Atusaye</h3>
+<p class="text-[#16642e] font-semibold text-xs mb-3">Accounting Professional</p>
+<p class="text-xs text-[#40493f] leading-relaxed px-2">Accounting professional ensuring financial accuracy and compliance for all marketplace transactions.</p>
 </div>
 </div>
 </section>
