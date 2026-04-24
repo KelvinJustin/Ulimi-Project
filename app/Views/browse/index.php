@@ -65,33 +65,33 @@
   <main class="pt-4 pb-16 px-6 max-w-7xl mx-auto">
     <!-- Search & Filter Section -->
     <header class="mb-12">
-      <div class="bg-surface-container-low p-6 rounded-xl atmospheric-glow">
-        <div class="flex flex-col lg:flex-row gap-4 items-center">
+      <div class="bg-surface-container-low p-5 rounded-xl atmospheric-glow">
+        <div class="flex flex-col lg:flex-row gap-3 items-center">
           <!-- Search Bar -->
           <div class="relative w-full lg:flex-1 group">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-            <input class="w-full bg-surface-container-lowest border-none py-4 pl-12 pr-4 rounded-xl focus:ring-2 focus:ring-primary/20 placeholder:text-on-surface-variant/60" placeholder="Search harvests, seeds, or organic tools..." type="text" id="searchInput" value="<?= htmlspecialchars($filters['q'] ?? '') ?>"/>
+            <input class="w-full bg-surface-container-lowest border-none py-3 pl-12 pr-4 rounded-xl focus:ring-2 focus:ring-primary/20 placeholder:text-on-surface-variant/60" placeholder="Search harvests, seeds, or organic tools..." type="text" id="searchInput" value="<?= htmlspecialchars($filters['q'] ?? '') ?>"/>
           </div>
           <!-- Filters Grid -->
-          <div class="flex flex-col lg:flex-row gap-3 w-full">
-            <div class="relative group w-full lg:w-auto">
-              <select id="categoryFilter" class="flex items-center gap-2 bg-surface-container-highest px-5 py-4 rounded-xl text-sm font-semibold hover:bg-surface-container-high transition-colors appearance-none cursor-pointer w-full">
-                <option value="all">All Categories</option>
-                <option value="grains" <?= ($filters['category'] ?? '') === 'grains' ? 'selected' : '' ?>>Grains & Cereals</option>
-                <option value="legumes" <?= ($filters['category'] ?? '') === 'legumes' ? 'selected' : '' ?>>Legumes & Pulses</option>
+          <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+            <div class="relative group flex-1 lg:flex-none">
+              <select id="categoryFilter" class="bg-surface-container-highest px-4 py-3 rounded-xl text-xs font-semibold hover:bg-surface-container-high transition-colors appearance-none cursor-pointer w-full min-w-[140px]">
+                <option value="all">Category</option>
+                <option value="grains" <?= ($filters['category'] ?? '') === 'grains' ? 'selected' : '' ?>>Grains</option>
+                <option value="legumes" <?= ($filters['category'] ?? '') === 'legumes' ? 'selected' : '' ?>>Legumes</option>
                 <option value="vegetables" <?= ($filters['category'] ?? '') === 'vegetables' ? 'selected' : '' ?>>Vegetables</option>
                 <option value="fruits" <?= ($filters['category'] ?? '') === 'fruits' ? 'selected' : '' ?>>Fruits</option>
                 <option value="cash-crops" <?= ($filters['category'] ?? '') === 'cash-crops' ? 'selected' : '' ?>>Cash Crops</option>
                 <option value="livestock" <?= ($filters['category'] ?? '') === 'livestock' ? 'selected' : '' ?>>Livestock</option>
-                <option value="inputs" <?= ($filters['category'] ?? '') === 'inputs' ? 'selected' : '' ?>>Farm Inputs</option>
+                <option value="inputs" <?= ($filters['category'] ?? '') === 'inputs' ? 'selected' : '' ?>>Inputs</option>
               </select>
             </div>
-            <div class="relative group w-full lg:w-auto">
-              <select id="locationFilter" class="flex items-center gap-2 bg-surface-container-highest px-5 py-4 rounded-xl text-sm font-semibold hover:bg-surface-container-high transition-colors appearance-none cursor-pointer w-full">
-                <option value="all">All Malawi</option>
-                <option value="lilongwe" <?= ($filters['location'] ?? '') === 'lilongwe' ? 'selected' : '' ?>>Lilongwe (Central)</option>
-                <option value="blantyre" <?= ($filters['location'] ?? '') === 'blantyre' ? 'selected' : '' ?>>Blantyre (Southern)</option>
-                <option value="mzuzu" <?= ($filters['location'] ?? '') === 'mzuzu' ? 'selected' : '' ?>>Mzuzu (Northern)</option>
+            <div class="relative group flex-1 lg:flex-none">
+              <select id="locationFilter" class="bg-surface-container-highest px-4 py-3 rounded-xl text-xs font-semibold hover:bg-surface-container-high transition-colors appearance-none cursor-pointer w-full min-w-[140px]">
+                <option value="all">Location</option>
+                <option value="lilongwe" <?= ($filters['location'] ?? '') === 'lilongwe' ? 'selected' : '' ?>>Lilongwe</option>
+                <option value="blantyre" <?= ($filters['location'] ?? '') === 'blantyre' ? 'selected' : '' ?>>Blantyre</option>
+                <option value="mzuzu" <?= ($filters['location'] ?? '') === 'mzuzu' ? 'selected' : '' ?>>Mzuzu</option>
                 <option value="zomba" <?= ($filters['location'] ?? '') === 'zomba' ? 'selected' : '' ?>>Zomba</option>
                 <option value="kasungu" <?= ($filters['location'] ?? '') === 'kasungu' ? 'selected' : '' ?>>Kasungu</option>
                 <option value="mangochi" <?= ($filters['location'] ?? '') === 'mangochi' ? 'selected' : '' ?>>Mangochi</option>
@@ -100,12 +100,12 @@
                 <option value="salima" <?= ($filters['location'] ?? '') === 'salima' ? 'selected' : '' ?>>Salima</option>
               </select>
             </div>
-            <div class="relative group w-full lg:w-auto">
-              <select id="sortBy" class="flex items-center gap-2 bg-surface-container-highest px-5 py-4 rounded-xl text-sm font-semibold hover:bg-surface-container-high transition-colors appearance-none cursor-pointer w-full">
-                <option value="newest" <?= ($filters['sort'] ?? '') === 'newest' ? 'selected' : '' ?>>Newest First</option>
-                <option value="price-low" <?= ($filters['sort'] ?? '') === 'price-low' ? 'selected' : '' ?>>Price: Low to High</option>
-                <option value="price-high" <?= ($filters['sort'] ?? '') === 'price-high' ? 'selected' : '' ?>>Price: High to Low</option>
-                <option value="popular" <?= ($filters['sort'] ?? '') === 'popular' ? 'selected' : '' ?>>Most Popular</option>
+            <div class="relative group flex-1 lg:flex-none">
+              <select id="sortBy" class="bg-surface-container-highest px-4 py-3 rounded-xl text-xs font-semibold hover:bg-surface-container-high transition-colors appearance-none cursor-pointer w-full min-w-[140px]">
+                <option value="newest" <?= ($filters['sort'] ?? '') === 'newest' ? 'selected' : '' ?>>Newest</option>
+                <option value="price-low" <?= ($filters['sort'] ?? '') === 'price-low' ? 'selected' : '' ?>>Price: Low</option>
+                <option value="price-high" <?= ($filters['sort'] ?? '') === 'price-high' ? 'selected' : '' ?>>Price: High</option>
+                <option value="popular" <?= ($filters['sort'] ?? '') === 'popular' ? 'selected' : '' ?>>Popular</option>
               </select>
             </div>
           </div>
@@ -125,16 +125,18 @@
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       <?php if (!empty($listings)): ?>
         <?php foreach ($listings as $listing): ?>
-          <div class="group cursor-pointer bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+          <div class="group cursor-pointer">
             <a href="<?= $base ?>/browse/<?= $listing['id'] ?>" class="block">
-              <div class="relative aspect-square mb-3 rounded-lg overflow-hidden bg-gray-100">
+              <div class="relative aspect-square mb-4 rounded-xl overflow-hidden bg-surface-container">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                      src="<?= $listing['image_path'] ? '/' . htmlspecialchars($listing['image_path']) : '/assets/images/placeholder-product.jpg' ?>"
                      alt="<?= htmlspecialchars($listing['title']) ?>"
                      onerror="this.src='/assets/images/placeholder-product.jpg'">
                 <div class="absolute top-3 right-3">
-                  <button class="bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-sm hover:bg-white transition-colors" onclick="event.preventDefault(); toggleFavorite(<?= $listing['id'] ?>)">
-                    <span class="material-symbols-outlined text-xl text-[#16642e]">favorite</span>
+                  <button class="bg-white/80 backdrop-blur-md p-1.5 rounded-lg shadow-atmospheric hover:bg-white transition-colors flex items-center justify-center" onclick="event.preventDefault(); toggleFavorite(<?= $listing['id'] ?>, this)">
+                    <span class="material-symbols-outlined text-xl text-primary favorite-icon" style="font-variation-settings: 'FILL' <?= in_array($listing['id'], $userFavorites ?? []) ? '1' : '0' ?>;">
+                      <?= in_array($listing['id'], $userFavorites ?? []) ? 'favorite' : 'favorite_border' ?>
+                    </span>
                   </button>
                 </div>
               </div>
@@ -154,7 +156,8 @@
                   <span class="material-symbols-outlined text-xs">location_on</span>
                   <span><?= formatLocation($listing) ?></span>
                 </div>
-                <button onclick="addToCart(<?= $listing['id'] ?>, event)" class="mt-3 w-full py-2 bg-[#16642e] text-white rounded-lg text-sm font-semibold hover:bg-[#206c34] transition-colors">
+                <button onclick="addToCart(<?= $listing['id'] ?>, event)" class="mt-3 w-full py-2.5 bg-gradient-to-br from-primary to-primary-container text-white rounded-full text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-sm">shopping_cart</span>
                   Add to Cart
                 </button>
               </div>
@@ -623,6 +626,9 @@
       document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     }
 
+    // CSRF token for API requests
+    const csrfToken = '<?= htmlspecialchars(\App\Core\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>';
+
     // Store cart items locally
     let cartItems = [];
 
@@ -827,9 +833,44 @@
       applyFilters();
     }
 
-    function toggleFavorite(listingId) {
-      // Simple favorite toggle - can be enhanced with API call
-      console.log('Toggle favorite for listing:', listingId);
+    function toggleFavorite(listingId, button) {
+      const icon = button.querySelector('.favorite-icon');
+      const isFavorited = icon.textContent === 'favorite';
+
+      // Toggle icon
+      icon.textContent = isFavorited ? 'favorite_border' : 'favorite';
+      icon.style.fontVariationSettings = isFavorited ? "'FILL' 0" : "'FILL' 1";
+
+      // Make API call with CSRF token in body
+      fetch('/api/favorites/' + (isFavorited ? 'remove' : 'add'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ listing_id: listingId, _csrf: csrfToken })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          // Revert on error
+          icon.textContent = isFavorited ? 'favorite' : 'favorite_border';
+          icon.style.fontVariationSettings = isFavorited ? "'FILL' 1" : "'FILL' 0";
+          console.error('Failed to toggle favorite:', data.message);
+        } else {
+          // Update favorites count
+          const favoritesCount = document.getElementById('favoritesCount');
+          if (favoritesCount) {
+            const currentCount = parseInt(favoritesCount.textContent) || 0;
+            favoritesCount.textContent = isFavorited ? currentCount - 1 : currentCount + 1;
+          }
+        }
+      })
+      .catch(error => {
+        // Revert on error
+        icon.textContent = isFavorited ? 'favorite' : 'favorite_border';
+        icon.style.fontVariationSettings = isFavorited ? "'FILL' 1" : "'FILL' 0";
+        console.error('Error toggling favorite:', error);
+      });
     }
   </script>
 </body>

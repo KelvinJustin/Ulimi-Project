@@ -33,9 +33,17 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '');
         <?php foreach ($favorites as $favorite): ?>
           <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
             <?php if (!empty($favorite['images'])): ?>
-              <img src="<?= $base ?>/<?= htmlspecialchars($favorite['images'][0], ENT_QUOTES, 'UTF-8') ?>" 
+              <?php 
+                $imagePath = $favorite['images'][0];
+                // Ensure path starts with /
+                if (!str_starts_with($imagePath, '/')) {
+                  $imagePath = '/' . $imagePath;
+                }
+              ?>
+              <img src="<?= htmlspecialchars($imagePath, ENT_QUOTES, 'UTF-8') ?>" 
                    alt="<?= htmlspecialchars($favorite['title'], ENT_QUOTES, 'UTF-8') ?>" 
-                   class="w-full h-48 object-cover">
+                   class="w-full h-48 object-cover" 
+                   onerror="this.style.display='none'; this.parentElement.style.backgroundColor='#f5f5f5'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'>No image</div>'">
             <?php else: ?>
               <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
                 <i class="fa fa-image text-4xl text-gray-300"></i>

@@ -115,7 +115,7 @@ final class Listing
         foreach ($listings as $listing) {
             // Delete images from filesystem
             if (!empty($listing['image_path'])) {
-                $imagePath = __DIR__ . '/../../public/' . $listing['image_path'];
+                $imagePath = PUBLIC_PATH . '/' . $listing['image_path'];
                 if (file_exists($imagePath)) {
                     unlink($imagePath);
                 }
@@ -128,7 +128,7 @@ final class Listing
 
             foreach ($listingImages as $image) {
                 if (!empty($image['path'])) {
-                    $imagePath = __DIR__ . '/../../public/' . $image['path'];
+                    $imagePath = PUBLIC_PATH . '/' . $image['path'];
                     if (file_exists($imagePath)) {
                         unlink($imagePath);
                     }
@@ -157,23 +157,26 @@ final class Listing
 
     public function cleanupOrphanedListings(): int
     {
-        // Get all user IDs from file storage (the actual active users)
-        $fileUserIds = array_column(\App\Core\FileUserStorage::loadUsers(), 'id');
+        // Get all user IDs from database (the actual active users)
+        $stmt = $this->db->prepare("SELECT id FROM users");
+        $stmt->execute();
+        $dbUsers = $stmt->fetchAll();
+        $dbUserIds = array_column($dbUsers, 'id');
 
-        // Find listings where seller_id doesn't exist in file storage
-        if (empty($fileUserIds)) {
-            // If no users in file storage, delete all listings
+        // Find listings where seller_id doesn't exist in database
+        if (empty($dbUserIds)) {
+            // If no users in database, delete all listings
             $stmt = $this->db->prepare("SELECT id, seller_id, image_path FROM commodity_listings");
             $stmt->execute();
         } else {
-            // Get listings where seller_id is NOT in file storage users
-            $placeholders = implode(',', array_fill(0, count($fileUserIds), '?'));
+            // Get listings where seller_id is NOT in database users
+            $placeholders = implode(',', array_fill(0, count($dbUserIds), '?'));
             $stmt = $this->db->prepare("
                 SELECT id, seller_id, image_path
                 FROM commodity_listings
                 WHERE seller_id NOT IN ($placeholders)
             ");
-            $stmt->execute($fileUserIds);
+            $stmt->execute($dbUserIds);
         }
 
         $orphanedListings = $stmt->fetchAll();
@@ -182,7 +185,7 @@ final class Listing
         foreach ($orphanedListings as $listing) {
             // Delete images from filesystem
             if (!empty($listing['image_path'])) {
-                $imagePath = __DIR__ . '/../../public/' . $listing['image_path'];
+                $imagePath = PUBLIC_PATH . '/' . $listing['image_path'];
                 if (file_exists($imagePath)) {
                     unlink($imagePath);
                 }
@@ -195,7 +198,7 @@ final class Listing
 
             foreach ($listingImages as $image) {
                 if (!empty($image['path'])) {
-                    $imagePath = __DIR__ . '/../../public/' . $image['path'];
+                    $imagePath = PUBLIC_PATH . '/' . $image['path'];
                     if (file_exists($imagePath)) {
                         unlink($imagePath);
                     }

@@ -5,8 +5,15 @@ namespace App\Models;
 
 use PDO;
 
-final class UserProfile extends Model
+final class UserProfile
 {
+    public $db;
+    
+    public function __construct()
+    {
+        $this->db = \App\Core\Database::pdo();
+    }
+    
     public function findByUserId(int $userId): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM user_profiles WHERE user_id = :uid LIMIT 1');

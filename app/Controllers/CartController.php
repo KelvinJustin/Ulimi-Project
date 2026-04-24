@@ -29,13 +29,7 @@ final class CartController
             error_log('CartController::addItem called');
             error_log('Request input: ' . json_encode($request->input()));
 
-            // Require buyer authentication
-            if (!Auth::check()) {
-                http_response_code(401);
-                echo json_encode(['success' => false, 'message' => 'Please log in to add items to cart']);
-                ob_end_clean();
-                return;
-            }
+            // Authentication check now handled by 'auth' middleware
 
             $user = Auth::user();
             
@@ -224,12 +218,7 @@ final class CartController
         header('Content-Type: application/json');
 
         try {
-            if (!Auth::check()) {
-                http_response_code(401);
-                echo json_encode(['success' => false, 'message' => 'Please log in to view cart']);
-                ob_end_clean();
-                return;
-            }
+            // Authentication check now handled by 'auth' middleware
 
             $user = Auth::user();
             $pdo = Database::pdo();
@@ -295,12 +284,7 @@ final class CartController
         header('Content-Type: application/json');
 
         try {
-            if (!Auth::check()) {
-                http_response_code(401);
-                echo json_encode(['success' => false, 'message' => 'Please log in to modify cart']);
-                ob_end_clean();
-                return;
-            }
+            // Authentication check now handled by 'auth' middleware
 
             $user = Auth::user();
             $cartItemId = (int)$request->input('cart_item_id', 0);
@@ -375,12 +359,7 @@ final class CartController
         header('Content-Type: application/json');
 
         try {
-            if (!Auth::check()) {
-                http_response_code(401);
-                echo json_encode(['success' => false, 'message' => 'Please log in to modify cart']);
-                ob_end_clean();
-                return;
-            }
+            // Authentication check now handled by 'auth' middleware
 
             $user = Auth::user();
             $cartItemId = (int)$request->input('cart_item_id', 0);
@@ -464,11 +443,7 @@ final class CartController
 
     public function checkout(): void
     {
-        // Check if user is logged in
-        if (!Auth::check()) {
-            header('Location: /login');
-            exit;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $pdo = Database::pdo();
@@ -538,7 +513,7 @@ final class CartController
         // Calculate fees
         $platformFee = $subtotal * 0.05; // 5% platform fee
         $deliveryFee = 0; // TODO: Calculate based on location/weight
-        $tax = 0; // 0% tax
+        $tax = 0.175; // 17.5% tax
         $total = $subtotal + $platformFee + $deliveryFee + $tax;
 
         if (empty($cartItemsWithDetails)) {

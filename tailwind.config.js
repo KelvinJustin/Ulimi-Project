@@ -83,7 +83,11 @@ module.exports = {
         body: ['"DM Sans"', 'sans-serif'],
       },
       borderRadius: {
-        'xl': '10px',
+        'xl': '0.75rem',
+        '2xl': '1rem',
+      },
+      boxShadow: {
+        'atmospheric': '0px 12px 32px rgba(26, 61, 34, 0.06)',
       },
       transitionTimingFunction: {
         'custom': 'cubic-bezier(0.4, 0, 0.2, 1)',

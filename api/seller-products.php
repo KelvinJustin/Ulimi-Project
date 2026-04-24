@@ -18,24 +18,16 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Load user data
-$usersFile = __DIR__ . '/../storage/users.php';
-if (file_exists($usersFile)) {
-    $users = include $usersFile;
-} else {
-    $users = [];
-}
+// Load database configuration
+require_once __DIR__ . '/../marketplace/config/db.php';
 
-// Find current user
-$currentUser = null;
-foreach ($users as $user) {
-    if ($user['id'] == $_SESSION['user_id']) {
-        $currentUser = $user;
-        break;
-    }
-}
+// Get current user from database
+$stmt = $pdo->prepare("SELECT u.*, up.display_name FROM users u LEFT JOIN user_profiles up ON u.id = up.user_id WHERE u.id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$currentUser = $stmt->fetch();
 
-if (!$currentUser || $currentUser['role'] !== 'seller') {
+// Role ID mapping: 1 = seller, 2 = buyer, 3 = admin
+if (!$currentUser || $currentUser['role_id'] !== 1) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Access denied - Seller role required']);
     exit;

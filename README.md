@@ -2,6 +2,66 @@
 
 A PHP-based agricultural marketplace connecting farmers and buyers.
 
+## Recent Updates (April 24, 2026)
+
+### Major Architectural Improvements
+
+**Issues Resolved:**
+- **No dependency manager**: Added Composer support for dependency management
+- **Mixed storage strategies**: Migrated from file-based user storage to database-backed User model
+- **No service container**: Implemented PSR-11 compliant Dependency Injection Container
+- **Hardcoded paths**: Replaced hardcoded paths with STORAGE_PATH constant throughout codebase
+- **No middleware system**: Implemented complete middleware pipeline with 8 middleware classes
+- **No rate limiting**: Implemented RateLimitMiddleware with configurable groups
+- **No HTTPS enforcement**: Implemented HttpsMiddleware to enforce HTTPS on all routes
+
+**Statistics:**
+- 49 files modified
+- 870 lines added, 6,654 lines deleted (net reduction: 5,784 lines)
+- Code cleanup and modernization across controllers, views, and core components
+
+### New Features
+
+**Middleware System:**
+- AuthenticationMiddleware - User authentication checking
+- CsrfMiddleware - CSRF token validation
+- HttpsMiddleware - HTTPS enforcement
+- RateLimitMiddleware - Rate limiting with configurable groups (auth, api, api-guest, upload, general)
+- RoleMiddleware - Role-based access control (admin, seller, buyer)
+- Pipeline - Middleware pipeline execution
+- AbstractMiddleware & MiddlewareInterface - Base classes and interfaces
+
+**Dependency Injection Container:**
+- PSR-11 compliant container with automatic dependency resolution
+- Singleton and binding support
+- Automatic constructor dependency injection
+
+**Router Enhancements:**
+- Fluent middleware registration via RouteBuilder
+- Middleware groups for common patterns (auth, admin, seller, buyer)
+- Pipeline-based middleware execution
+- Container integration for dependency injection
+
+**Database Migration:**
+- User model migrated from file-based storage to database
+- Automatic slug generation for users
+- Role ID to role string mapping
+- Full CRUD operations for user management
+
+### Bug Fixes
+
+**Favorites Page:**
+- Fixed undefined "unit" key warning by adding `cl.currency as unit` to SQL query
+- Fixed image loading by implementing fallback to `listing_image_path` when gallery images are missing
+- Improved image path construction to ensure proper URL formatting
+- Added onerror handler for failed image loads
+
+**Code Quality:**
+- Removed 6,654 lines of legacy/deprecated code
+- Deleted obsolete views (add-listing, create-listing, seller-listings, etc.)
+- Removed file-based user storage system
+- Consolidated access-denied view location
+
 ## Prerequisites
 
 - PHP 7.4 or higher
@@ -132,8 +192,13 @@ This will check:
 ulimi3/
 ├── app/
 │   ├── Controllers/     # Application controllers
-│   ├── Core/           # Core framework (Database, Auth, etc.)
-│   ├── Models/         # Data models
+│   ├── Core/           # Core framework
+│   │   ├── Middleware/  # Middleware classes (auth, CSRF, rate limiting, etc.)
+│   │   ├── Container.php # Dependency injection container
+│   │   ├── Database.php # Database connection
+│   │   ├── Auth.php     # Authentication system
+│   │   └── Router.php   # Routing with middleware support
+│   ├── Models/         # Data models (User, Listing, Order, etc.)
 │   ├── Routes/         # Route definitions
 │   └── Views/          # View templates
 ├── public/             # Public web root
@@ -146,7 +211,10 @@ ulimi3/
 │       ├── debug_database.php # Debug verification script
 │       └── migrations/        # Migration scripts
 ├── marketplace/         # Marketplace module
-└── api/                # API endpoints
+├── api/                # API endpoints
+├── tests/              # PHPUnit tests
+├── database/           # Database utilities
+└── composer.json       # Composer dependencies
 ```
 
 ## Database Tables
@@ -174,6 +242,49 @@ The main database includes:
 
 1. Start Apache and MySQL from XAMPP Control Panel
 2. Access the application at `http://ulimi3.local` (if configured) or `http://localhost/ulimi3/public`
+
+### Middleware System
+
+The application now uses a middleware pipeline for request processing. Middleware can be applied to routes using the fluent API:
+
+```php
+// Apply single middleware
+$router->get('/dashboard', fn() => $controller->dashboard())
+    ->middleware('auth');
+
+// Apply multiple middleware
+$router->post('/api/products', fn() => $controller->create())
+    ->middleware('auth', 'throttle-api');
+
+// Predefined middleware groups:
+// - auth: Authentication + CSRF
+// - admin: Admin role check
+// - seller: Seller role check
+// - buyer: Buyer role check
+// - throttle-auth: Rate limit auth endpoints
+// - throttle-api: Rate limit API endpoints
+// - throttle-api-guest: Rate limit guest API endpoints
+// - throttle-upload: Rate limit file uploads
+// - throttle-general: General rate limiting
+```
+
+### Dependency Injection
+
+The application uses a PSR-11 compliant container for dependency injection. Controllers can type-hint dependencies:
+
+```php
+final class BrowseController
+{
+    private Listing $listingModel;
+
+    public function __construct(Listing $listingModel = null)
+    {
+        $this->listingModel = $listingModel ?? new Listing();
+    }
+}
+```
+
+The container automatically resolves dependencies from the constructor.
 
 ### Adding New Migrations
 
@@ -212,8 +323,30 @@ For table-specific checks, use the utility scripts in `storage/sql/migrations/`:
 
 - Update default database credentials in production
 - Use environment variables for sensitive configuration
-- Enable HTTPS in production
-- Regularly update dependencies
+- Enable HTTPS in production (now enforced by HttpsMiddleware)
+- Regularly update dependencies via Composer
+- Rate limiting is now enabled on all API and auth endpoints
+- CSRF protection is enforced on authenticated routes
+- Role-based access control prevents unauthorized access
+
+### Breaking Changes
+
+**User Storage Migration:**
+- User data is now stored in the database instead of `storage/users.php`
+- Old file-based user storage has been removed
+- Run the migration script if upgrading from an older version:
+  ```bash
+  php storage/sql/migrations/migrate_file_users.php
+  ```
+
+**Middleware Requirements:**
+- All routes now use middleware for authentication and authorization
+- Manual auth checks in controllers have been removed
+- Routes must use the fluent middleware API to apply protection
+
+**Path Constants:**
+- Hardcoded paths have been replaced with `STORAGE_PATH` constant
+- Ensure the constant is defined in your bootstrap file
 
 ## License
 

@@ -160,7 +160,7 @@
 <span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
 <h3 class="text-lg font-bold">Owen Gerald</h3>
-<p class="text-[#16642e] font-semibold text-xs mb-3">CEO</p>
+<p class="text-[#16642e] font-semibold text-xs mb-3"><STRONG>CEO</STRONG></p>
 <p class="text-xs text-[#40493f] leading-relaxed px-2">An accountant with deep knowledge of sales and marketing, driving strategic growth and financial excellence.</p>
 </div>
 <!-- Team Card 2 - Technical Head -->
@@ -169,25 +169,25 @@
 <span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
 <h3 class="text-lg font-bold">Kelvin Nthinda</h3>
-<p class="text-[#16642e] font-semibold text-xs mb-3">Technical Expert Head</p>
+<p class="text-[#16642e] font-semibold text-xs mb-3"><STRONG>CTO</STRONG></p>
 <p class="text-xs text-[#40493f] leading-relaxed px-2">Technical expert leading the development of innovative solutions for the agricultural marketplace.</p>
 </div>
-<!-- Team Card 3 - COO -->
-<div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
-<div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
-</div>
-<h3 class="text-lg font-bold">Zinyengo Nkandawire</h3>
-<p class="text-[#16642e] font-semibold text-xs mb-3">COO</p>
-<p class="text-xs text-[#40493f] leading-relaxed px-2">Streamlining operations and ensuring every connection on Ulimi translates to real impact.</p>
-</div>
+  <!-- Team Card 3 - COO
+  <div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
+  <div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
+  <span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
+  </div>
+  <h3 class="text-lg font-bold">Zinyengo Nkandawire</h3>
+  <p class="text-[#16642e] font-semibold text-xs mb-3">COO</p>
+  <p class="text-xs text-[#40493f] leading-relaxed px-2">Streamlining operations and ensuring every connection on Ulimi translates to real impact.</p>
+  </div> -->
 <!-- Team Card 4 - Marketing Professional -->
 <div class="bg-white p-6 rounded-[1.5rem] atmospheric-shadow text-center group border border-transparent hover:border-[#bfc9bc]/20 transition-all">
 <div class="relative w-32 h-32 mx-auto mb-4 bg-[#e7e2d9] rounded-full flex items-center justify-center">
 <span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
-<h3 class="text-lg font-bold">Mbayomo</h3>
-<p class="text-[#16642e] font-semibold text-xs mb-3">Marketing Professional</p>
+<h3 class="text-lg font-bold">Mbamoyo</h3>
+<p class="text-[#16642e] font-semibold text-xs mb-3"><STRONG>CFO</STRONG></p>
 <p class="text-xs text-[#40493f] leading-relaxed px-2">Marketing expert driving brand awareness and customer engagement across Malawi's agricultural sector.</p>
 </div>
 <!-- Team Card 5 - Accounting Professional -->
@@ -196,7 +196,7 @@
 <span class="material-symbols-outlined text-[#16642e] text-5xl">person</span>
 </div>
 <h3 class="text-lg font-bold">Atusaye</h3>
-<p class="text-[#16642e] font-semibold text-xs mb-3">Accounting Professional</p>
+<p class="text-[#16642e] font-semibold text-xs mb-3"><STRONG>COO</STRONG></p>
 <p class="text-xs text-[#40493f] leading-relaxed px-2">Accounting professional ensuring financial accuracy and compliance for all marketplace transactions.</p>
 </div>
 </div>

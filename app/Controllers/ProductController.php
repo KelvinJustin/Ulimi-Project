@@ -13,12 +13,18 @@ use App\Models\Commodity;
 
 final class ProductController
 {
+    private Listing $listingModel;
+    private Commodity $commodityModel;
+
+    public function __construct(Listing $listingModel = null, Commodity $commodityModel = null)
+    {
+        $this->listingModel = $listingModel ?? new Listing();
+        $this->commodityModel = $commodityModel ?? new Commodity();
+    }
+
     public function showCreateListing(): void
     {
-        // Ensure user is logged in and is a seller
-        Auth::requireSeller();
-        
-        View::render('create-listing', [
+        View::render('listings.create', [
             'title' => 'Create Listing - Ulimi Agricultural Marketplace',
             'csrf' => Csrf::token(),
             'errors' => [],
@@ -55,18 +61,10 @@ final class ProductController
         // Debug logging
         error_log('=== CREATE LISTING START ===');
         
-        // Ensure user is logged in and is a seller
-        Auth::requireSeller();
-        
         $user = Auth::user();
         error_log('User authenticated: ' . json_encode($user));
 
-        if (!Csrf::verify($request->input('_csrf'))) {
-            error_log('CSRF validation failed');
-            http_response_code(419);
-            echo 'Invalid CSRF token';
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
         
         error_log('CSRF validation passed');
 
@@ -140,7 +138,7 @@ final class ProductController
 
         // If not saving as draft, validate all required fields
         if (!$isDraft && $errors) {
-            View::render('create-listing', [
+            View::render('listings.create', [
                 'title' => 'Create Listing - Ulimi Agricultural Marketplace',
                 'csrf' => Csrf::token(),
                 'errors' => $errors,
@@ -185,7 +183,7 @@ final class ProductController
         // Create product using database with fallback
         try {
             error_log('Starting database operations');
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
             error_log('Database connection established');
             
@@ -241,7 +239,7 @@ final class ProductController
             ];
             
             // Render success screen
-            View::render('create-listing-success', [
+            View::render('listings.success', [
                 'title' => 'Listing Created Successfully - Ulimi Agricultural Marketplace',
                 'listing' => $listingData
             ]);
@@ -250,7 +248,7 @@ final class ProductController
         } catch (Exception $e) {
             error_log('Failed to create listing: ' . $e->getMessage());
             error_log('Exception trace: ' . $e->getTraceAsString());
-            View::render('create-listing', [
+            View::render('listings.create', [
                 'title' => 'Create Listing - Ulimi Agricultural Marketplace',
                 'csrf' => Csrf::token(),
                 'errors' => ['general' => 'Failed to create listing: ' . $e->getMessage()],
@@ -293,7 +291,7 @@ final class ProductController
         }
 
         // Create upload directory if it doesn't exist
-        $uploadDir = __DIR__ . '/../../public/uploads/products';
+        $uploadDir = UPLOADS_PATH . '/products';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -313,8 +311,7 @@ final class ProductController
     private function findOrCreateCommodity(string $title, string $category): array
     {
         // Use database connection from Listing model for consistency
-        $listing = new Listing();
-        $pdo = $listing->db;
+        $pdo = $this->listingModel->db;
         
         // Try to find existing commodity by name (more specific)
         $stmt = $pdo->prepare("SELECT * FROM commodities WHERE name = ? LIMIT 1");
@@ -400,7 +397,7 @@ final class ProductController
         header('Content-Type: application/json');
         
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $filters = [
                 'category' => $request->input('category'),
                 'location' => $request->input('location'),
@@ -427,17 +424,17 @@ final class ProductController
     public function showListings(): void
     {
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $listings = $listing->search([]); // Get all listings
             
-            View::render('listings', [
+            View::render('listings.index', [
                 'title' => 'Current Listings - Ulimi Agricultural Marketplace',
                 'listings' => $listings
             ]);
             
         } catch (Exception $e) {
             error_log('Error fetching listings: ' . $e->getMessage());
-            View::render('listings', [
+            View::render('listings.index', [
                 'title' => 'Current Listings - Ulimi Agricultural Marketplace',
                 'listings' => [],
                 'error' => 'Unable to load listings at this time. Please try again later.'
@@ -447,17 +444,15 @@ final class ProductController
 
     public function showSellerListings(): void
     {
-        // Require seller role
-        Auth::requireSeller();
+        $user = Auth::user();
         
         try {
-            $user = Auth::user();
-            $listing = new Listing();
+            $listing = $this->listingModel;
             
             // Get listings for the current seller
             $listings = $listing->search(['seller_id' => $user['id']]);
             
-            View::render('seller-listings', [
+            View::render('listings.seller', [
                 'title' => 'My Listings - Ulimi Agricultural Marketplace',
                 'listings' => $listings,
                 'user' => $user,
@@ -466,7 +461,7 @@ final class ProductController
 
         } catch (Exception $e) {
             error_log('Error fetching seller listings: ' . $e->getMessage());
-            View::render('seller-listings', [
+            View::render('listings.seller', [
                 'title' => 'My Listings - Ulimi Agricultural Marketplace',
                 'listings' => [],
                 'error' => 'Unable to load your listings at this time. Please try again later.',
@@ -480,15 +475,9 @@ final class ProductController
         header('Content-Type: application/json');
 
         try {
-            // Verify CSRF token
-            if (!Csrf::verify($request->input('_csrf'))) {
-                http_response_code(419);
-                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-                return;
-            }
+            // CSRF validation is now handled by CsrfMiddleware
 
             // Require seller authentication
-            Auth::requireSeller();
             $user = Auth::user();
 
             $listingId = (int)$request->input('listing_id', 0);
@@ -499,7 +488,7 @@ final class ProductController
             }
 
             // Get the listing to verify ownership
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
             $stmt = $pdo->prepare("SELECT * FROM commodity_listings WHERE id = ? AND seller_id = ?");
             $stmt->execute([$listingId, $user['id']]);
@@ -513,7 +502,7 @@ final class ProductController
 
             // Delete listing images from filesystem
             if (!empty($listingData['image_path'])) {
-                $imagePath = __DIR__ . '/../../public/' . $listingData['image_path'];
+                $imagePath = PUBLIC_PATH . '/' . $listingData['image_path'];
                 if (file_exists($imagePath)) {
                     unlink($imagePath);
                 }
@@ -526,7 +515,7 @@ final class ProductController
 
             foreach ($listingImages as $image) {
                 if (!empty($image['path'])) {
-                    $imagePath = __DIR__ . '/../../public/' . $image['path'];
+                    $imagePath = PUBLIC_PATH . '/' . $image['path'];
                     if (file_exists($imagePath)) {
                         unlink($imagePath);
                     }
@@ -536,6 +525,12 @@ final class ProductController
             // Delete listing from database
             $pdo->beginTransaction();
             try {
+                // Delete from related tables first (in case CASCADE isn't working)
+                $pdo->prepare("DELETE FROM cart_items WHERE listing_id = ?")->execute([$listingId]);
+                $pdo->prepare("DELETE FROM favorites WHERE listing_id = ?")->execute([$listingId]);
+                $pdo->prepare("DELETE FROM messages WHERE conversation_id IN (SELECT id FROM conversations WHERE listing_id = ?)")->execute([$listingId]);
+                $pdo->prepare("DELETE FROM conversations WHERE listing_id = ?")->execute([$listingId]);
+                
                 // Delete from listing_images if exists
                 $pdo->prepare("DELETE FROM listing_images WHERE listing_id = ?")->execute([$listingId]);
                 
@@ -559,19 +554,17 @@ final class ProductController
 
     public function showEditListing(Request $request, array $params): void
     {
-        Auth::requireSeller();
         $user = Auth::user();
         $listingId = (int)($params['id'] ?? 0);
 
         // Get the listing to verify ownership
-        $listing = new Listing();
-        $pdo = $listing->db;
+        $pdo = $this->listingModel->db;
         $stmt = $pdo->prepare("SELECT * FROM commodity_listings WHERE id = ? AND seller_id = ?");
         $stmt->execute([$listingId, $user['id']]);
         $listingData = $stmt->fetch();
 
         if (!$listingData) {
-            View::render('seller-listings', [
+            View::render('listings.seller', [
                 'title' => 'My Listings - Ulimi Agricultural Marketplace',
                 'listings' => [],
                 'error' => 'Listing not found or you do not have permission to edit it.'
@@ -622,26 +615,19 @@ final class ProductController
 
     public function updateListing(Request $request, array $params): void
     {
-        Auth::requireSeller();
         $user = Auth::user();
         $listingId = (int)($params['id'] ?? 0);
 
-        // Verify CSRF
-        if (!Csrf::verify($request->input('_csrf'))) {
-            http_response_code(419);
-            echo 'Invalid CSRF token';
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
 
         // Get the listing to verify ownership
-        $listing = new Listing();
-        $pdo = $listing->db;
+        $pdo = $this->listingModel->db;
         $stmt = $pdo->prepare("SELECT * FROM commodity_listings WHERE id = ? AND seller_id = ?");
         $stmt->execute([$listingId, $user['id']]);
         $listingData = $stmt->fetch();
 
         if (!$listingData) {
-            View::render('seller-listings', [
+            View::render('listings.seller', [
                 'title' => 'My Listings - Ulimi Agricultural Marketplace',
                 'listings' => [],
                 'error' => 'Listing not found or you do not have permission to edit it.'
@@ -705,7 +691,7 @@ final class ProductController
                 $imagePath = $newImagePath;
                 // Delete old image if it exists
                 if (!empty($listingData['image_path'])) {
-                    $oldImagePath = __DIR__ . '/../../public/' . $listingData['image_path'];
+                    $oldImagePath = PUBLIC_PATH . '/' . $listingData['image_path'];
                     if (file_exists($oldImagePath)) {
                         unlink($oldImagePath);
                     }
@@ -714,7 +700,7 @@ final class ProductController
         }
 
         if ($errors) {
-            View::render('create-listing', [
+            View::render('listings.create', [
                 'title' => 'Edit Listing - Ulimi Agricultural Marketplace',
                 'csrf' => Csrf::token(),
                 'errors' => $errors,
@@ -766,7 +752,7 @@ final class ProductController
             ]);
 
             // Render success screen
-            View::render('create-listing-success', [
+            View::render('listings.success', [
                 'title' => 'Listing Updated Successfully - Ulimi Agricultural Marketplace',
                 'listing' => [
                     'title' => $title,
@@ -780,7 +766,7 @@ final class ProductController
 
         } catch (Exception $e) {
             error_log('Failed to update listing: ' . $e->getMessage());
-            View::render('create-listing', [
+            View::render('listings.create', [
                 'title' => 'Edit Listing - Ulimi Agricultural Marketplace',
                 'csrf' => Csrf::token(),
                 'errors' => ['general' => 'Failed to update listing: ' . $e->getMessage()],
@@ -804,8 +790,7 @@ final class ProductController
 
     private function saveListingImage(int $listingId, string $imagePath): void
     {
-        $listing = new Listing();
-        $pdo = $listing->db;
+        $pdo = $this->listingModel->db;
         $stmt = $pdo->prepare("
             INSERT INTO listing_images (listing_id, path, sort_order)
             VALUES (?, ?, 0)
@@ -817,15 +802,9 @@ final class ProductController
     {
         header('Content-Type: application/json');
 
-        // Verify CSRF token
-        if (!Csrf::verify($request->input('_csrf'))) {
-            http_response_code(419);
-            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
 
-        // Require admin role
-        Auth::requireAdmin();
+        // Require admin role - now handled by 'admin' middleware
 
         $listingId = (int)$request->input('listing_id', 0);
         if ($listingId <= 0) {
@@ -835,7 +814,7 @@ final class ProductController
         }
 
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
 
             $stmt = $pdo->prepare("UPDATE commodity_listings SET status = 'active', updated_at = NOW() WHERE id = ?");
@@ -853,15 +832,9 @@ final class ProductController
     {
         header('Content-Type: application/json');
 
-        // Verify CSRF token
-        if (!Csrf::verify($request->input('_csrf'))) {
-            http_response_code(419);
-            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
 
-        // Require admin role
-        Auth::requireAdmin();
+        // Require admin role - now handled by 'admin' middleware
 
         $listingId = (int)$request->input('listing_id', 0);
         if ($listingId <= 0) {
@@ -871,7 +844,7 @@ final class ProductController
         }
 
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
 
             $stmt = $pdo->prepare("UPDATE commodity_listings SET status = 'draft', updated_at = NOW() WHERE id = ?");
@@ -889,19 +862,9 @@ final class ProductController
     {
         header('Content-Type: application/json');
 
-        // Verify CSRF token
-        if (!Csrf::verify($request->input('_csrf'))) {
-            http_response_code(419);
-            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
 
-        // Require authentication
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not logged in']);
-            return;
-        }
+        // Require authentication - now handled by 'admin' middleware
 
         $listingId = (int)$request->input('listing_id', 0);
         if ($listingId <= 0) {
@@ -911,7 +874,7 @@ final class ProductController
         }
 
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
             $user = Auth::user();
 
@@ -948,11 +911,10 @@ final class ProductController
     {
         header('Content-Type: application/json');
 
-        // Require admin role
-        Auth::requireAdmin();
+        // Require admin role - now handled by 'admin' middleware
 
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
 
             $stmt = $pdo->prepare("
@@ -983,11 +945,10 @@ final class ProductController
     {
         header('Content-Type: application/json');
 
-        // Require admin role
-        Auth::requireAdmin();
+        // Require admin role - now handled by 'admin' middleware
 
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
 
             // Get filter parameters
@@ -1038,7 +999,7 @@ final class ProductController
     {
         // This method can be called via cron job or manually to auto-archive listings older than 4 months
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $pdo = $listing->db;
 
             // Archive listings that are active and older than 4 months

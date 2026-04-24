@@ -1,7 +1,6 @@
 <?php $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/'); ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <footer style="background: #1A1A16; color: rgba(255,255,255,0.6); padding: 64px 0 32px;">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">

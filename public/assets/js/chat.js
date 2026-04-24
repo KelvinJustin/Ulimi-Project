@@ -221,6 +221,15 @@ function escapeHtml(text) {
 async function updateNotificationBadge() {
     try {
         const response = await fetch(`${API_BASE}/api/messages/unread-count`);
+        
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // Response is not JSON (likely HTML error page or redirect)
+            // Skip this update silently
+            return;
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -246,12 +255,16 @@ async function updateNotificationBadge() {
             }
         }
     } catch (error) {
-        console.error('Error updating notification badge:', error);
+        // Silently fail - don't spam console
     }
 }
 
 // Initialize notification polling
 function startNotificationPolling() {
+    // Disabled for now - requires authentication check on backend
+    // TODO: Re-enable when authentication is properly implemented for API routes
+    return;
+    
     updateNotificationBadge();
     setInterval(updateNotificationBadge, 10000); // Check every 10 seconds
 }

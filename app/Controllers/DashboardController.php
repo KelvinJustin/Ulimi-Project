@@ -6,16 +6,23 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Core\Csrf;
 use App\Core\Auth;
+use App\Models\User;
+use App\Models\Listing;
 
 final class DashboardController
 {
+    private User $userModel;
+    private Listing $listingModel;
+
+    public function __construct(User $userModel = null, Listing $listingModel = null)
+    {
+        $this->userModel = $userModel ?? new User();
+        $this->listingModel = $listingModel ?? new Listing();
+    }
+
     public function index(): void
     {
-        // Require authentication
-        if (!Auth::check()) {
-            Auth::redirectToLogin();
-            return;
-        }
+        // Authentication and role checks now handled by 'auth' middleware
 
         // Prevent admins from accessing user dashboard
         if (Auth::isAdmin()) {
@@ -31,8 +38,7 @@ final class DashboardController
         $listingCount = 0;
         if ($userRole === 'seller') {
             try {
-                $listing = new \App\Models\Listing();
-                $listings = $listing->search(['seller_id' => $user['id'], 'status' => ['pending', 'active']]);
+                $listings = $this->listingModel->search(['seller_id' => $user['id'], 'status' => ['pending', 'active']]);
                 $listingCount = count($listings);
             } catch (Exception $e) {
                 error_log('Failed to fetch listing count: ' . $e->getMessage());
@@ -88,31 +94,20 @@ final class DashboardController
 
     public function adminIndex(): void
     {
-        // Check if user is logged in and is admin
-        if (!Auth::check()) {
-            Auth::redirectToLogin();
-            return;
-        }
-
-        if (!Auth::isAdmin()) {
-            http_response_code(403);
-            echo 'Access denied - Admin role required. Normal users should use /dashboard';
-            exit;
-        }
+        // Authentication and role checks now handled by 'admin' middleware
 
         // Fetch total listings count
         $totalListings = 0;
         try {
-            $listing = new \App\Models\Listing();
-            $listings = $listing->search([]);
+            $listings = $this->listingModel->search([]);
             $totalListings = count($listings);
         } catch (Exception $e) {
             error_log('Failed to fetch total listings count: ' . $e->getMessage());
             $totalListings = 0;
         }
 
-        // Fetch all users from FileUserStorage (consistent with Auth system)
-        $users = \App\Core\FileUserStorage::loadUsers();
+        // Fetch all users from database
+        $users = $this->userModel->getAll();
 
         // Render the admin dashboard view
         View::render('dashboard/index', [
@@ -126,17 +121,7 @@ final class DashboardController
 
     public function adminListings(): void
     {
-        // Check if user is logged in and is admin
-        if (!Auth::check()) {
-            Auth::redirectToLogin();
-            return;
-        }
-
-        if (!Auth::isAdmin()) {
-            http_response_code(403);
-            echo 'Access denied - Admin role required';
-            exit;
-        }
+        // Authentication and role checks now handled by 'admin' middleware
 
         View::render('admin/listings', [
             'title' => 'Pending Listings - Admin - Ulimi',
@@ -157,23 +142,9 @@ final class DashboardController
 
         error_log('deleteUser called');
 
-        // Verify CSRF token
-        if (!Csrf::verify($request->input('_csrf'))) {
-            error_log('CSRF verification failed');
-            http_response_code(419);
-            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-            ob_end_clean();
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
 
-        // Check admin role manually to prevent HTML output
-        if (!Auth::check() || !Auth::isAdmin()) {
-            error_log('Admin check failed');
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Admin access required']);
-            ob_end_clean();
-            return;
-        }
+        // Admin role check now handled by 'admin' middleware
 
         $userId = (int)$request->input('user_id', 0);
         error_log('Deleting user ID: ' . $userId);
@@ -194,8 +165,8 @@ final class DashboardController
             return;
         }
 
-        // Use FileUserStorage to delete user (consistent with Auth system)
-        $success = \App\Core\FileUserStorage::deleteUser($userId);
+        // Use User model to delete user
+        $success = $this->userModel->delete($userId);
         error_log('Delete result: ' . ($success ? 'success' : 'failed'));
         
         if ($success) {
@@ -220,15 +191,6 @@ final class DashboardController
 
         error_log('viewUser called');
 
-        // Check admin role manually to prevent HTML output
-        if (!Auth::check() || !Auth::isAdmin()) {
-            error_log('Admin check failed in viewUser');
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Admin access required']);
-            ob_end_clean();
-            return;
-        }
-
         $userId = (int)$request->input('user_id', 0);
         error_log('Viewing user ID: ' . $userId);
         
@@ -239,8 +201,8 @@ final class DashboardController
             return;
         }
 
-        // Use FileUserStorage to fetch user (consistent with Auth system)
-        $user = \App\Core\FileUserStorage::findById($userId);
+        // Use User model to fetch user
+        $user = $this->userModel->findById($userId);
         
         if (!$user) {
             error_log('User not found: ' . $userId);
@@ -288,7 +250,7 @@ final class DashboardController
             return;
         }
 
-        $success = \App\Core\FileUserStorage::deleteUser($userId);
+        $success = $this->userModel->delete($userId);
         
         if ($success) {
             echo json_encode(['success' => true, 'message' => 'User deleted successfully']);
@@ -301,22 +263,12 @@ final class DashboardController
     {
         header('Content-Type: application/json');
 
-        // Check admin role
-        if (!Auth::check() || !Auth::isAdmin()) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Admin access required']);
-            return;
-        }
+        // Admin role check now handled by 'admin' middleware
 
-        // Verify CSRF token
-        if (!Csrf::verify($request->input('_csrf'))) {
-            http_response_code(419);
-            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-            return;
-        }
+        // CSRF validation is now handled by CsrfMiddleware
 
         try {
-            $deletedCount = \App\Core\FileUserStorage::cleanupOrphanedListings();
+            $deletedCount = $this->listingModel->cleanupOrphanedListings();
             echo json_encode([
                 'success' => true,
                 'message' => "Cleaned up {$deletedCount} orphaned listings",

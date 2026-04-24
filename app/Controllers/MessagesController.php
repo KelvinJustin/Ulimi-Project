@@ -11,11 +11,7 @@ final class MessagesController
 {
     public function index(): void
     {
-        // Require authentication and seller role
-        if (!Auth::check()) {
-            Auth::redirectToLogin();
-            return;
-        }
+        // Authentication and role checks now handled by 'seller' middleware
 
         $user = Auth::user();
 
@@ -85,11 +81,7 @@ final class MessagesController
 
     public function viewConversation(array $params): void
     {
-        // Require authentication and seller role
-        if (!Auth::check()) {
-            Auth::redirectToLogin();
-            return;
-        }
+        // Authentication and role checks now handled by 'seller' middleware
 
         $user = Auth::user();
         

@@ -11,24 +11,21 @@ use App\Models\Listing;
 
 final class ApiController
 {
+    private Listing $listingModel;
+
+    public function __construct(Listing $listingModel = null)
+    {
+        $this->listingModel = $listingModel ?? new Listing();
+    }
+
     public function sellerProducts(Request $request): void
     {
-        // Require authentication
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not logged in']);
-            return;
-        }
+        // Authentication and role checks now handled by 'seller' middleware
 
         $user = Auth::user();
-        if (!$user || $user['role'] !== 'seller') {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Access denied - Seller role required']);
-            return;
-        }
 
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $filters = ['seller_id' => $user['id']];
             $products = $listing->search($filters);
 
@@ -55,7 +52,7 @@ final class ApiController
     public function products(Request $request): void
     {
         try {
-            $listing = new Listing();
+            $listing = $this->listingModel;
             $filters = [
                 'category' => $request->input('category'),
                 'location' => $request->input('location'),
@@ -82,12 +79,7 @@ final class ApiController
 
     public function addFavorite(Request $request): void
     {
-        // Require authentication
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not logged in']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $listingId = $request->input('listing_id');
@@ -151,12 +143,7 @@ final class ApiController
 
     public function removeFavorite(Request $request): void
     {
-        // Require authentication
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not logged in']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $listingId = $request->input('listing_id');
@@ -213,12 +200,7 @@ final class ApiController
 
     public function getFavorites(Request $request): void
     {
-        // Require authentication
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not logged in']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
 

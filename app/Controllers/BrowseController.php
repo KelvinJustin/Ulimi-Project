@@ -10,6 +10,13 @@ use App\Models\Listing;
 
 final class BrowseController
 {
+    private Listing $listingModel;
+
+    public function __construct(Listing $listingModel = null)
+    {
+        $this->listingModel = $listingModel ?? new Listing();
+    }
+
     public function index(): void
     {
         // Get filter parameters from query string
@@ -36,8 +43,7 @@ final class BrowseController
         }
 
         // Fetch listings from database
-        $listingModel = new Listing();
-        $listings = $listingModel->search($searchFilters);
+        $listings = $this->listingModel->search($searchFilters);
         $count = count($listings);
 
         // Get authentication state
@@ -102,18 +108,12 @@ final class BrowseController
 
     public function favorites(): void
     {
-        $isLoggedIn = Auth::check();
-        
-        if (!$isLoggedIn) {
-            // Redirect to login if not logged in
-            header('Location: /login');
-            exit;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         
         // Direct file logging instead of error_log
-        file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Favorites page - User ID: ' . $user['id'] . PHP_EOL, FILE_APPEND);
+        file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Favorites page - User ID: ' . $user['id'] . PHP_EOL, FILE_APPEND);
         error_log('Favorites page - User ID: ' . $user['id']);
         
         try {
@@ -123,7 +123,7 @@ final class BrowseController
             $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM favorites WHERE user_id = ?");
             $stmt->execute([$user['id']]);
             $count = $stmt->fetch();
-            file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Favorites count for user: ' . $count['count'] . PHP_EOL, FILE_APPEND);
+            file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Favorites count for user: ' . $count['count'] . PHP_EOL, FILE_APPEND);
             
             // Fetch user's favorite listing IDs with listing details
             $stmt = $pdo->prepare("
@@ -133,11 +133,12 @@ final class BrowseController
                     cl.description,
                     cl.price_per_unit as price,
                     cl.quantity_available as quantity,
-                    cl.currency,
+                    cl.currency as unit,
                     cl.location_text as location,
                     cl.quality_grade,
                     cl.status,
                     cl.created_at,
+                    cl.image_path as listing_image_path,
                     c.name as commodity_name,
                     c.category as commodity_category,
                     up.display_name as seller_name,
@@ -156,7 +157,7 @@ final class BrowseController
             ");
             $stmt->execute([$user['id']]);
             $favorites = $stmt->fetchAll();
-            file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Fetched ' . count($favorites) . ' favorites with details' . PHP_EOL, FILE_APPEND);
+            file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Fetched ' . count($favorites) . ' favorites with details' . PHP_EOL, FILE_APPEND);
             
             // Group images by listing ID
             $listingsWithImages = [];
@@ -171,11 +172,18 @@ final class BrowseController
                 }
             }
             
+            // Apply fallback for listings with no images
+            foreach ($listingsWithImages as $listingId => $listing) {
+                if (empty($listing['images']) && !empty($listing['listing_image_path'])) {
+                    $listingsWithImages[$listingId]['images'][] = $listing['listing_image_path'];
+                }
+            }
+            
             $favorites = array_values($listingsWithImages);
-            file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Final favorites count after grouping: ' . count($favorites) . PHP_EOL, FILE_APPEND);
+            file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Final favorites count after grouping: ' . count($favorites) . PHP_EOL, FILE_APPEND);
             
         } catch (\PDOException $e) {
-            file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'PDOException in favorites: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
+            file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'PDOException in favorites: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
             // Table doesn't exist - try to create it automatically
             if (str_contains($e->getMessage(), "doesn't exist") || str_contains($e->getMessage(), "Table")) {
                 try {
@@ -190,7 +198,7 @@ final class BrowseController
                         INDEX idx_favorites_user (user_id),
                         INDEX idx_favorites_listing (listing_id)
                     ) ENGINE=InnoDB");
-                    file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Created favorites table' . PHP_EOL, FILE_APPEND);
+                    file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Created favorites table' . PHP_EOL, FILE_APPEND);
                     
                     // Retry fetching favorites after creating table
                     $stmt = $pdo->prepare("
@@ -200,11 +208,12 @@ final class BrowseController
                             cl.description,
                             cl.price_per_unit as price,
                             cl.quantity_available as quantity,
-                            cl.currency,
+                            cl.currency as unit,
                             cl.location_text as location,
                             cl.quality_grade,
                             cl.status,
                             cl.created_at,
+                            cl.image_path as listing_image_path,
                             c.name as commodity_name,
                             c.category as commodity_category,
                             up.display_name as seller_name,
@@ -237,13 +246,20 @@ final class BrowseController
                         }
                     }
                     
+                    // Apply fallback for listings with no images
+                    foreach ($listingsWithImages as $listingId => $listing) {
+                        if (empty($listing['images']) && !empty($listing['listing_image_path'])) {
+                            $listingsWithImages[$listingId]['images'][] = $listing['listing_image_path'];
+                        }
+                    }
+                    
                     $favorites = array_values($listingsWithImages);
                 } catch (\PDOException $createError) {
-                    file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Failed to create favorites table: ' . $createError->getMessage() . PHP_EOL, FILE_APPEND);
+                    file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Failed to create favorites table: ' . $createError->getMessage() . PHP_EOL, FILE_APPEND);
                     $favorites = [];
                 }
             } else {
-                file_put_contents(__DIR__ . '/../../storage/debug.log', date('[Y-m-d H:i:s] ') . 'Failed to fetch favorites: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
+                file_put_contents(STORAGE_PATH . '/debug.log', date('[Y-m-d H:i:s] ') . 'Failed to fetch favorites: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
                 $favorites = [];
             }
         }

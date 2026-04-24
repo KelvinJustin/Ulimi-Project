@@ -14,11 +14,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $sellerId = (int)($request->input('seller_id') ?? 0);
@@ -74,11 +70,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $conversationId = $params['id'] ?? 0;
@@ -191,11 +183,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $conversationId = (int)($request->input('conversation_id') ?? 0);
@@ -248,11 +236,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
             http_response_code(400);
@@ -288,7 +272,7 @@ final class MessageController
         }
 
         // Create upload directory
-        $uploadDir = __DIR__ . '/../../public/uploads/messages';
+        $uploadDir = UPLOADS_PATH . '/messages';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -309,11 +293,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
 
@@ -345,11 +325,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
 
@@ -444,11 +420,7 @@ final class MessageController
     {
         header('Content-Type: application/json');
 
-        if (!Auth::check()) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-            return;
-        }
+        // Authentication check now handled by 'auth' middleware
 
         $user = Auth::user();
         $sellerId = (int)($request->input('seller_id') ?? 0);

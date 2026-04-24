@@ -5,8 +5,15 @@ namespace App\Models;
 
 use PDO;
 
-final class Order extends Model
+final class Order
 {
+    public $db;
+    
+    public function __construct()
+    {
+        $this->db = \App\Core\Database::pdo();
+    }
+    
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM orders WHERE id = :id LIMIT 1');

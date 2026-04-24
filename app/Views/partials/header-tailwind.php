@@ -16,6 +16,9 @@ function isNavLinkActive($href, $currentPath) {
 }
 ?>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta name="csrf-token" content="<?= htmlspecialchars(\App\Core\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+
 <header class="bg-white border-b border-ash-grey/30 sticky top-0 z-50">
   <nav aria-label="Global" class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
     <!-- Logo -->
@@ -58,11 +61,11 @@ function isNavLinkActive($href, $currentPath) {
         <div class="relative">
           <?php if ($user['role'] === 'seller'): ?>
             <a href="<?= $base ?>/messages" class="flex items-center justify-center w-10 h-10 rounded-full bg-soft-linen text-dark-fern hover:bg-olive hover:text-white transition-colors">
-              <i class="fa fa-envelope"></i>
+              <i class="fa-solid fa-envelope"></i>
             </a>
           <?php else: ?>
             <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-400 cursor-not-allowed" title="Messages available for sellers only">
-              <i class="fa fa-envelope"></i>
+              <i class="fa-solid fa-envelope"></i>
             </div>
           <?php endif; ?>
           <span id="messageBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">0</span>

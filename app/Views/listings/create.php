@@ -10,8 +10,9 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
   <title><?= htmlspecialchars($title ?? 'Create Listing - Ulimi Agricultural Marketplace', ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/app.css">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/output.css">
   <link rel="icon" type="image/png" href="<?= $base ?>/logo.png">
   
   <style>
@@ -696,11 +697,11 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
           Cancel
         </button>
         <button type="submit" class="btn btn-secondary" name="save_as_draft" value="1" id="draftBtn">
-          <i class="fa fa-save"></i>
+          <i class="fa-solid fa-save"></i>
           Save as Draft
         </button>
         <button type="submit" class="btn btn-primary" id="submitBtn">
-          <i class="fa fa-<?= !empty($isEdit) ? 'check-circle' : 'plus-circle' ?>"></i>
+          <i class="fa-solid fa-<?= !empty($isEdit) ? 'check-circle' : 'plus-circle' ?>"></i>
           <?= !empty($isEdit) ? 'Update Listing' : 'Submit for Approval' ?>
         </button>
       </div>
@@ -792,7 +793,7 @@ $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/');
       form.addEventListener('submit', function(e) {
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating...';
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
         
         // Form will submit normally
       });

@@ -19,8 +19,15 @@ final class Auth
             return null;
         }
 
-        // Use file storage instead of database
-        return FileUserStorage::findById((int)$id);
+        $userModel = new \App\Models\User();
+        $user = $userModel->findById((int)$id);
+        
+        // Add role string for backward compatibility
+        if ($user) {
+            $user['role'] = self::roleIdToRole($user['role_id']);
+        }
+        
+        return $user;
     }
 
     public static function check(): bool
@@ -72,7 +79,7 @@ final class Auth
         if (!$user || !in_array($user['role'], $roles)) {
             http_response_code(403);
             if (!headers_sent()) {
-                View::render('access-denied', [
+                View::render('auth.access-denied', [
                     'title' => 'Access Denied - Ulimi Agricultural Marketplace'
                 ]);
             }
@@ -82,7 +89,8 @@ final class Auth
 
     public static function attempt(string $email, string $password): bool
     {
-        $user = FileUserStorage::verifyCredentials($email, $password);
+        $userModel = new \App\Models\User();
+        $user = $userModel->verifyCredentials($email, $password);
         if ($user) {
             self::login($user['id']);
             return true;
@@ -118,7 +126,7 @@ final class Auth
         if (!self::isSeller()) {
             http_response_code(403);
             if (!headers_sent()) {
-                View::render('access-denied', [
+                View::render('auth.access-denied', [
                     'title' => 'Access Denied - Ulimi Agricultural Marketplace'
                 ]);
             }
@@ -137,7 +145,7 @@ final class Auth
             http_response_code(403);
             if (!headers_sent()) {
                 // Show proper access denied page
-                View::render('access-denied', [
+                View::render('auth.access-denied', [
                     'title' => 'Access Denied - Ulimi Agricultural Marketplace'
                 ]);
             }
@@ -169,11 +177,21 @@ final class Auth
         if (!self::isBuyer()) {
             http_response_code(403);
             if (!headers_sent()) {
-                View::render('access-denied', [
+                View::render('auth.access-denied', [
                     'title' => 'Access Denied - Ulimi Agricultural Marketplace'
                 ]);
             }
             exit;
         }
+    }
+
+    private static function roleIdToRole(int $roleId): string
+    {
+        $roleMap = [
+            1 => 'seller',
+            2 => 'buyer',
+            3 => 'admin'
+        ];
+        return $roleMap[$roleId] ?? 'buyer';
     }
 }

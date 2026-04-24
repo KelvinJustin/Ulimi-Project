@@ -1,5 +1,6 @@
 <?php $base = rtrim((string)\App\Core\Config::get('app.base_url', ''), '/'); ?>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <footer>
   <div class="container">
     <div class="footer-grid">
@@ -10,11 +11,11 @@
         </a>
         <p>Ulimi is building a platform that connects farms to markets and helps solve the challenges ahead in Malawi's agricultural supply chain.</p>
         <div class="footer-socials" style="margin-top:20px;">
-          <a href="#" target="_blank" title="Facebook"><i class="fa fa-facebook"></i></a>
-          <a href="#" target="_blank" title="Twitter"><i class="fa fa-twitter"></i></a>
-          <a href="#" target="_blank" title="Instagram"><i class="fa fa-instagram"></i></a>
-          <a href="#" target="_blank" title="YouTube"><i class="fa fa-youtube"></i></a>
-          <a href="#" target="_blank" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+          <a href="#" target="_blank" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" target="_blank" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" target="_blank" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
         </div>
       </div>
       <div class="footer-col">
